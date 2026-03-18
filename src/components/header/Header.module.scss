@@ -1,0 +1,446 @@
+@use 'sass:color';
+
+// Variables
+$primary-color: #213f7d;
+$secondary-color: #39cdcc;
+$text-primary: #213f7d;
+$text-secondary: #545f7d;
+$border-color: rgba(33, 63, 125, 0.1);
+$white: #ffffff;
+$input-bg: #fafafa;
+$hover-bg: rgba(57, 205, 204, 0.1);
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+// Breakpoints
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-large: 1280px;
+
+.header {
+    position: fixed; // Changed from sticky to fixed
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: $white;
+    box-shadow: $shadow;
+    z-index: 1000;
+    padding: 0 1.5rem;
+
+    @media (max-width: $breakpoint-tablet) {
+        padding: 0 1rem;
+    }
+}
+
+.headerContainer {
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+
+    @media (max-width: $breakpoint-tablet) {
+        height: 70px;
+        gap: 1rem;
+    }
+}
+
+// Logo Section
+.logoSection {
+    flex-shrink: 0;
+
+    .logo {
+        width: 144.8px;
+        height: 30px;
+        object-fit: contain;
+
+        @media (max-width: $breakpoint-tablet) {
+            width: 115.84px;
+            height: 24px;
+        }
+    }
+}
+
+// Search Section
+.searchSection {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 2rem;
+
+    @media (max-width: $breakpoint-desktop) {
+        max-width: 300px;
+        margin: 0 1rem;
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        display: none;
+    }
+
+    .searchForm {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 40px;
+        background: $input-bg;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+
+        &:focus-within {
+            border-color: $secondary-color;
+            box-shadow: 0 0 0 3px rgba(57, 205, 204, 0.1);
+        }
+
+        .searchInput {
+            flex: 1;
+            height: 100%;
+            padding: 0 1rem;
+            border: none;
+            background: transparent;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 14px;
+            color: $text-primary;
+            outline: none;
+
+            &::placeholder {
+                color: $text-secondary;
+                opacity: 0.7;
+                font-size: 14px;
+            }
+        }
+
+        .searchButton {
+            width: 56px;
+            height: 100%;
+            background: $secondary-color;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background: color.adjust($secondary-color, $lightness: -5%);
+            }
+
+            &:active {
+                background: color.adjust($secondary-color, $lightness: -10%);
+            }
+
+            .searchIcon {
+                color: $white;
+                font-size: 18px;
+            }
+        }
+    }
+}
+
+// Actions Section
+.actionsSection {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-shrink: 0;
+
+    @media (max-width: $breakpoint-desktop) {
+        gap: 1.5rem;
+    }
+
+    @media (max-width: $breakpoint-tablet) {
+        gap: 1rem;
+    }
+
+    .docsLink {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: $text-primary;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: $secondary-color;
+        }
+
+        @media (max-width: $breakpoint-tablet) {
+            font-size: 14px;
+        }
+    }
+
+    .notificationButton {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        .notificationIcon {
+            color: $primary-color;
+            font-size: 22px;
+
+            @media (max-width: $breakpoint-tablet) {
+                font-size: 20px;
+            }
+        }
+    }
+}
+
+// Profile Section
+.profileSection {
+    position: relative;
+
+    .profileButton {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background: $hover-bg;
+        }
+
+        .profileInfo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            @media (max-width: $breakpoint-mobile) {
+                display: none;
+            }
+
+            .userName {
+                font-family: 'Work Sans', sans-serif;
+                font-size: 16px;
+                font-weight: 500;
+                color: $text-primary;
+
+                @media (max-width: $breakpoint-tablet) {
+                    font-size: 14px;
+                }
+            }
+
+            .dropdownIcon {
+                color: $primary-color;
+                font-size: 16px;
+                transition: transform 0.3s ease;
+
+                &.rotated {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+
+        .avatarWrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: $secondary-color;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            @media (max-width: $breakpoint-tablet) {
+                width: 35px;
+                height: 35px;
+            }
+
+            .avatar {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .avatarPlaceholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Work Sans', sans-serif;
+                font-size: 18px;
+                font-weight: 600;
+                color: $white;
+                background: $secondary-color;
+                text-transform: uppercase;
+            }
+        }
+    }
+
+    .dropdownMenu {
+        position: absolute;
+        top: calc(100% + 0.5rem);
+        right: 0;
+        min-width: 180px;
+        background: $white;
+        border-radius: 8px;
+        box-shadow: $shadow;
+        overflow: hidden;
+        z-index: 1001;
+        animation: slideDown 0.2s ease;
+
+        .dropdownList {
+            list-style: none;
+            padding: 0.5rem 0;
+            margin: 0;
+
+            .dropdownItem {
+                width: 100%;
+                padding: 0.75rem 1.5rem;
+                background: none;
+                border: none;
+                font-family: 'Work Sans', sans-serif;
+                font-size: 14px;
+                color: $text-primary;
+                text-align: left;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                &:hover {
+                    background: $hover-bg;
+                    color: $secondary-color;
+                    padding-left: 2rem;
+                }
+            }
+        }
+    }
+}
+
+// Mobile Menu Button
+.mobileMenuButton {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+
+    @media (max-width: $breakpoint-tablet) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menuIcon {
+        color: $primary-color;
+        font-size: 28px;
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: $secondary-color;
+        }
+    }
+}
+
+// Mobile Menu
+.mobileMenu {
+    display: none;
+
+    @media (max-width: $breakpoint-tablet) {
+        display: block;
+        padding: 1rem;
+        background: $white;
+        border-top: 1px solid $border-color;
+        animation: slideDown 0.3s ease;
+    }
+
+    .mobileSearch {
+        width: 100%;
+
+        .mobileSearchForm {
+            display: flex;
+            align-items: center;
+            height: 45px;
+            background: $input-bg;
+            border: 1px solid $border-color;
+            border-radius: 8px;
+            overflow: hidden;
+
+            .mobileSearchInput {
+                flex: 1;
+                height: 100%;
+                padding: 0 1rem;
+                border: none;
+                background: transparent;
+                font-size: 14px;
+                color: $text-primary;
+                outline: none;
+
+                &::placeholder {
+                    color: $text-secondary;
+                    opacity: 0.7;
+                }
+            }
+
+            .mobileSearchButton {
+                width: 56px;
+                height: 100%;
+                background: $secondary-color;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background-color 0.3s ease;
+
+                &:hover {
+                    background: color.adjust($secondary-color, $lightness: -5%);
+                }
+
+                .mobileSearchIcon {
+                    color: $white;
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+}
+
+// Animations
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Tablet Styles
+@media (min-width: $breakpoint-tablet) and (max-width: $breakpoint-desktop) {
+    .headerContainer {
+        gap: 1rem;
+    }
+
+    .searchSection {
+        max-width: 250px;
+        margin: 0 0.5rem;
+    }
+
+    .actionsSection {
+        gap: 1rem;
+    }
+}
