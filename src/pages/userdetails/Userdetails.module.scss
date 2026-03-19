@@ -1,0 +1,510 @@
+// ============ UserDetails.module.scss ============
+// Color tokens matching the Lendsqr design system
+
+$primary: #39cdcc;
+$primary-dark: #213f7d;
+$danger: #e4033b;
+$text-main: #213f7d;
+$text-label: #545f7d;
+$text-body: #3d4451;
+$bg-page: #fbfbfb;
+$bg-card: #ffffff;
+$border: #e5e5e5;
+$star-fill: #e9b200;
+$star-empty: #c8cacd;
+
+// Status colors
+$status-active-bg: rgba(57, 205, 98, 0.06);
+$status-active-color: #39cd62;
+
+// ============ PAGE CONTAINER ============
+// DashboardLayout owns the shell (header + sidebar + scroll).
+// .container is just the inner page padding — no positioning needed.
+.container {
+    padding: 32px 40px;
+    background: $bg-page;
+    font-family: 'Work Sans', sans-serif;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+    }
+}
+
+// ============ BACK BUTTON ============
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-body;
+    font-size: 14px;
+    font-family: inherit;
+    padding: 0;
+    margin-bottom: 24px;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    svg {
+        font-size: 16px;
+    }
+}
+
+// ============ PAGE HEADER ============
+.pageHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: $text-main;
+        margin: 0;
+    }
+}
+
+.headerActions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+// ============ CACHE BADGE ============
+.cacheBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.cacheBadgeFresh {
+    background: rgba(57, 205, 98, 0.1);
+    color: #39cd62;
+}
+
+.cacheBadgeStale {
+    background: rgba(233, 178, 0, 0.12);
+    color: #b58900;
+}
+
+.cacheBadgeRevalidating {
+    background: rgba(57, 205, 204, 0.1);
+    color: $primary;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+// ============ REFRESH BUTTON ============
+.btnRefresh {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid $border;
+    border-radius: 6px;
+    font-size: 16px;
+    color: $text-label;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        border-color: $primary;
+        color: $primary;
+        transform: rotate(30deg);
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+.btnBlacklist {
+    padding: 10px 20px;
+    border: 1px solid $danger;
+    background: transparent;
+    color: $danger;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+        background: $danger;
+        color: #fff;
+    }
+}
+
+.btnActivate {
+    padding: 10px 20px;
+    border: 1px solid $primary;
+    background: transparent;
+    color: $primary;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+        background: $primary;
+        color: #fff;
+    }
+}
+
+// ============ PROFILE CARD ============
+.profileCard {
+    background: $bg-card;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.profileTop {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 32px 40px 0;
+    flex-wrap: wrap;
+    gap: 24px;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px 0;
+        gap: 16px;
+    }
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profileName {
+    font-size: 22px;
+    font-weight: 600;
+    color: $text-main;
+    margin: 0;
+}
+
+.profileId {
+    font-size: 14px;
+    color: $text-body;
+    margin: 0;
+}
+
+.divider {
+    width: 1px;
+    height: 72px;
+    background: $border;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
+}
+
+.tierInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tierLabel {
+    font-size: 13px;
+    color: $text-body;
+    margin: 0;
+}
+
+.starRating {
+    display: flex;
+    gap: 4px;
+}
+
+.starFilled {
+    color: $star-fill;
+    fill: $star-fill;
+    font-size: 16px;
+}
+
+.starEmpty {
+    color: $star-empty;
+    font-size: 16px;
+}
+
+.balanceInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.balanceAmount {
+    font-size: 22px;
+    font-weight: 700;
+    color: $text-main;
+    margin: 0;
+}
+
+.bankInfo {
+    font-size: 13px;
+    color: $text-body;
+    margin: 0;
+}
+
+// ============ TABS ============
+.tabs {
+    display: flex;
+    margin-top: 28px;
+    padding: 0 40px;
+    border-bottom: 1px solid $border;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        padding: 0 16px;
+    }
+}
+
+.tab {
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    color: $text-label;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+
+    &:hover {
+        color: $primary;
+    }
+}
+
+.tabActive {
+    color: $primary;
+    border-bottom-color: $primary;
+    font-weight: 500;
+}
+
+// ============ DETAILS CARD ============
+.detailsCard {
+    background: $bg-card;
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    padding: 32px 40px;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+    }
+}
+
+// ============ SECTION ============
+.section {
+    margin-bottom: 0;
+}
+
+.sectionTitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-main;
+    margin: 0 0 24px;
+}
+
+.sectionContent {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sectionDivider {
+    border: none;
+    border-top: 1px solid $border;
+    margin: 28px 0;
+}
+
+// ============ INFO GRIDS ============
+.grid5 {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 28px 16px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 600px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.grid4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 16px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 600px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px 16px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ============ INFO FIELD ============
+.infoField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.infoLabel {
+    font-size: 11px;
+    font-weight: 400;
+    color: $text-label;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.infoValue {
+    font-size: 15px;
+    font-weight: 500;
+    color: $text-main;
+    word-break: break-word;
+}
+
+// ============ EMPTY TAB ============
+.emptyTab {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 0;
+
+    p {
+        color: $text-label;
+        font-size: 15px;
+    }
+}
+
+// ============ LOADING & ERROR ============
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 16px;
+    color: $text-label;
+    font-size: 15px;
+}
+
+.loader {
+    width: 40px;
+    height: 40px;
+    border: 3px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 16px;
+    color: $danger;
+    font-size: 15px;
+
+    button {
+        padding: 10px 24px;
+        background: $primary;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: inherit;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 0.85;
+        }
+    }
+}

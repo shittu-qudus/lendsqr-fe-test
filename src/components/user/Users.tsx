@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import styles from './Users.module.scss';
 import {
     FiUsers,
@@ -12,6 +13,7 @@ import { BsPiggyBank } from 'react-icons/bs';
 import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
 import { HiOutlineDotsVertical } from 'react-icons/hi';
 
+// ============ TYPES ============
 interface User {
     id: string;
     name: string;
@@ -25,114 +27,515 @@ interface User {
     hasSavings: boolean;
 }
 
+interface FilterOptions {
+    organization: string;
+    username: string;
+    email: string;
+    date: string;
+    phoneNumber: string;
+    status: string;
+}
+
+interface PaginationInfo {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+}
+
+// ============ FILTER COMPONENT ============
+interface FilterProps {
+    onFilter: (filters: FilterOptions) => void;
+    onClose: () => void;
+    organizations: string[];
+}
+
+const Filter: React.FC<FilterProps> = ({ onFilter, onClose, organizations }) => {
+    const [filters, setFilters] = useState<FilterOptions>({
+        organization: '',
+        username: '',
+        email: '',
+        date: '',
+        phoneNumber: '',
+        status: ''
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onFilter(filters);
+        onClose();
+    };
+
+    const handleReset = () => {
+        const resetFilters: FilterOptions = {
+            organization: '',
+            username: '',
+            email: '',
+            date: '',
+            phoneNumber: '',
+            status: ''
+        };
+        setFilters(resetFilters);
+        onFilter(resetFilters);
+        onClose();
+    };
+
+    return (
+        <div className={styles.filterOverlay} onClick={onClose}>
+            <div className={styles.filterContainer} onClick={(e) => e.stopPropagation()}>
+                <form onSubmit={handleSubmit} className={styles.filterForm}>
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="organization">Organization</label>
+                        <select
+                            id="organization"
+                            name="organization"
+                            value={filters.organization}
+                            onChange={handleChange}
+                            className={styles.filterSelect}
+                        >
+                            <option value="">Select</option>
+                            {organizations.map(org => (
+                                <option key={org} value={org}>{org}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="username">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="User"
+                            value={filters.username}
+                            onChange={handleChange}
+                            className={styles.filterInput}
+                        />
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Email"
+                            value={filters.email}
+                            onChange={handleChange}
+                            className={styles.filterInput}
+                        />
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="date">Date</label>
+                        <input
+                            type="date"
+                            id="date"
+                            name="date"
+                            value={filters.date}
+                            onChange={handleChange}
+                            className={styles.filterInput}
+                        />
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="phoneNumber">Phone Number</label>
+                        <input
+                            type="tel"
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            placeholder="Phone Number"
+                            value={filters.phoneNumber}
+                            onChange={handleChange}
+                            className={styles.filterInput}
+                        />
+                    </div>
+
+                    <div className={styles.filterGroup}>
+                        <label htmlFor="status">Status</label>
+                        <select
+                            id="status"
+                            name="status"
+                            value={filters.status}
+                            onChange={handleChange}
+                            className={styles.filterSelect}
+                        >
+                            <option value="">Select</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="pending">Pending</option>
+                            <option value="blacklisted">Blacklisted</option>
+                        </select>
+                    </div>
+
+                    <div className={styles.filterButtons}>
+                        <button type="button" className={styles.resetButton} onClick={handleReset}>
+                            Reset
+                        </button>
+                        <button type="submit" className={styles.filterButton}>
+                            Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+// ============ STAT CARD COMPONENT ============
+interface StatCardProps {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    color: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ icon, label, value, color }) => (
+    <div className={styles.statCard}>
+        <div className={styles.statIcon} style={{ backgroundColor: color }}>
+            {icon}
+        </div>
+        <p className={styles.statLabel}>{label}</p>
+        <h3 className={styles.statValue}>{value}</h3>
+    </div>
+);
+
+// ============ MAIN USERS COMPONENT ============
 const Users: React.FC = () => {
+    const navigate = useNavigate();
+
+    // State
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [showFilter, setShowFilter] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showFilter, setShowFilter] = useState<boolean>(false);
+    const [organizations, setOrganizations] = useState<string[]>([]);
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(9); // Show 9 rows like in the image
 
-    // Mock data for stats (you can replace with real data)
-    const stats = [
-        { icon: <FiUsers />, label: 'USERS', value: '2,453', color: '#fce8ff' },
-        { icon: <FiUserCheck />, label: 'ACTIVE USERS', value: '2,453', color: '#eee8ff' },
-        { icon: <BsPiggyBank />, label: 'USERS WITH LOANS', value: '12,453', color: '#feefec' },
-        { icon: <MdOutlineAccountBalanceWallet />, label: 'USERS WITH SAVINGS', value: '102,453', color: '#ffebf0' }
-    ];
+    // Pagination State
+    const [pagination, setPagination] = useState<PaginationInfo>({
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 10
+    });
 
-    // Mock data for users
-    const mockUsers = [
-        { id: '1', organization: 'Lendsqr', name: 'Adedeji', email: 'adedeji@lendsqr.com', phone: '08078903721', date: 'May 15, 2020 10:00 AM', status: 'inactive' },
-        { id: '2', organization: 'Irorun', name: 'Debby Ogana', email: 'debby2@irorun.com', phone: '08160780928', date: 'Apr 30, 2020 10:00 AM', status: 'pending' },
-        { id: '3', organization: 'Lendstar', name: 'Grace Effiom', email: 'grace@lendstar.com', phone: '07060780922', date: 'Apr 30, 2020 10:00 AM', status: 'blacklisted' },
-        { id: '4', organization: 'Lendsqr', name: 'Tosin Dokunmu', email: 'tosin@lendsqr.com', phone: '07003309226', date: 'Apr 10, 2020 10:00 AM', status: 'pending' },
-        { id: '5', organization: 'Lendstar', name: 'Grace Effiom', email: 'grace@lendstar.com', phone: '07060780922', date: 'Apr 30, 2020 10:00 AM', status: 'active' },
-        { id: '6', organization: 'Lendsqr', name: 'Tosin Dokunmu', email: 'tosin@lendsqr.com', phone: '08060780900', date: 'Apr 10, 2020 10:00 AM', status: 'active' },
-        { id: '7', organization: 'Lendstar', name: 'Grace Effiom', email: 'grace@lendstar.com', phone: '07060780922', date: 'Apr 30, 2020 10:00 AM', status: 'blacklisted' },
-        { id: '8', organization: 'Lendsqr', name: 'Tosin Dokunmu', email: 'tosin@lendsqr.com', phone: '08060780900', date: 'Apr 10, 2020 10:00 AM', status: 'inactive' },
-        { id: '9', organization: 'Lendstar', name: 'Grace Effiom', email: 'grace@lendstar.com', phone: '07060780922', date: 'Apr 30, 2020 10:00 AM', status: 'inactive' }
-    ];
+    // Stats
+    const [stats, setStats] = useState({
+        totalUsers: '0',
+        activeUsers: '0',
+        usersWithLoans: '0',
+        usersWithSavings: '0'
+    });
 
     useEffect(() => {
-        // Use mock data directly
-        setUsers(mockUsers as User[]);
-        setFilteredUsers(mockUsers as User[]);
-        setLoading(false);
+        fetchUsers();
     }, []);
 
-    const getStatusClass = (status: string) => {
+    useEffect(() => {
+        if (users.length > 0) {
+            const total = users.length;
+            const active = users.filter(user => user.isActiveUser === true).length;
+            const withLoans = users.filter(user => user.hasLoan === true).length;
+            const withSavings = users.filter(user => user.hasSavings === true).length;
+
+            setStats({
+                totalUsers: total.toLocaleString(),
+                activeUsers: active.toLocaleString(),
+                usersWithLoans: withLoans.toLocaleString(),
+                usersWithSavings: withSavings.toLocaleString()
+            });
+
+            const orgs = [...new Set(users.map(user => user.organization))];
+            setOrganizations(orgs);
+        }
+    }, [users]);
+
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get('http://localhost:3001/users');
+
+            const userData: User[] = response.data.map((user: Record<string, unknown>) => ({
+                id: String(user.id),
+                name: String(user.name),
+                email: String(user.email),
+                phone: String(user.phone),
+                organization: String(user.organization),
+                date: String(user.date),
+                status: user.status as User['status'],
+                isActiveUser: user.isActiveUser === true || user.isActiveUser === 'true',
+                hasLoan: user.hasLoan === true || user.hasLoan === 'true',
+                hasSavings: user.hasSavings === true || user.hasSavings === 'true'
+            }));
+
+            setUsers(userData);
+            setFilteredUsers(userData);
+            setPagination(prev => ({
+                ...prev,
+                totalItems: userData.length,
+                totalPages: Math.ceil(userData.length / prev.itemsPerPage)
+            }));
+            setError(null);
+        } catch {
+            setError('Failed to fetch users');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Filter Handler
+    const handleFilter = (filters: FilterOptions) => {
+        const filtered = users.filter(user => {
+            let matches = true;
+
+            if (filters.organization && user.organization !== filters.organization) matches = false;
+            if (filters.username && !user.name.toLowerCase().includes(filters.username.toLowerCase())) matches = false;
+            if (filters.email && !user.email.toLowerCase().includes(filters.email.toLowerCase())) matches = false;
+            if (filters.phoneNumber && !user.phone.includes(filters.phoneNumber)) matches = false;
+            if (filters.status && user.status !== filters.status) matches = false;
+
+            if (filters.date) {
+                const userDate = new Date(user.date).toISOString().split('T')[0];
+                if (userDate !== filters.date) matches = false;
+            }
+
+            return matches;
+        });
+
+        setFilteredUsers(filtered);
+        setPagination(prev => ({
+            ...prev,
+            currentPage: 1,
+            totalItems: filtered.length,
+            totalPages: Math.ceil(filtered.length / prev.itemsPerPage)
+        }));
+        setShowFilter(false);
+    };
+
+    // Pagination Handlers
+    const handlePageChange = (page: number) => {
+        setPagination(prev => ({ ...prev, currentPage: page }));
+    };
+
+    const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newItemsPerPage = Number(e.target.value);
+        setPagination(prev => ({
+            ...prev,
+            itemsPerPage: newItemsPerPage,
+            totalPages: Math.ceil(filteredUsers.length / newItemsPerPage),
+            currentPage: 1
+        }));
+    };
+
+    const getCurrentPageData = (): User[] => {
+        const start = (pagination.currentPage - 1) * pagination.itemsPerPage;
+        const end = start + pagination.itemsPerPage;
+        return filteredUsers.slice(start, end);
+    };
+
+    const getStatusClass = (status: string): string => {
         switch (status) {
             case 'active': return styles.statusActive;
             case 'pending': return styles.statusPending;
             case 'blacklisted': return styles.statusBlacklisted;
-            default: return styles.statusInactive;
+            case 'inactive': return styles.statusInactive;
+            default: return '';
         }
     };
 
-    const paginatedUsers = filteredUsers.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const formatDate = (dateString: string): string => {
+        try {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            }).replace(',', '');
+        } catch {
+            return dateString;
+        }
+    };
 
-    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+    // Navigate to user details
+    const handleViewDetails = (userId: string) => {
+        navigate(`/users/${userId}`);
+    };
 
     if (loading) {
-        return <div className={styles.loadingContainer}>Loading...</div>;
+        return (
+            <div className={styles.loadingContainer}>
+                <div className={styles.loader}></div>
+                <p>Loading users...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.errorContainer}>
+                <p>{error}</p>
+                <button onClick={fetchUsers}>Retry</button>
+            </div>
+        );
     }
 
     return (
         <div className={styles.usersContainer}>
-            {/* Stats Cards - Small boxes */}
-            <div className={styles.statsGrid}>
-                {stats.map((stat, index) => (
-                    <div key={index} className={styles.statCard}>
-                        <div className={styles.statIcon} style={{ backgroundColor: stat.color }}>
-                            {stat.icon}
-                        </div>
-                        <div className={styles.statLabel}>{stat.label}</div>
-                        <div className={styles.statValue}>{stat.value}</div>
-                    </div>
-                ))}
+            {/* Page Header */}
+            <div className={styles.pageHeader}>
+                <h1>Users</h1>
             </div>
 
-            {/* Users Table - Compact */}
+            {/* Stats Grid */}
+            <div className={styles.statsGrid}>
+                <StatCard
+                    icon={<FiUsers />}
+                    label="USERS"
+                    value={stats.totalUsers}
+                    color="#fce8ff"
+                />
+                <StatCard
+                    icon={<FiUserCheck />}
+                    label="ACTIVE USERS"
+                    value={stats.activeUsers}
+                    color="#eee8ff"
+                />
+                <StatCard
+                    icon={<BsPiggyBank />}
+                    label="USERS WITH LOANS"
+                    value={stats.usersWithLoans}
+                    color="#feefec"
+                />
+                <StatCard
+                    icon={<MdOutlineAccountBalanceWallet />}
+                    label="USERS WITH SAVINGS"
+                    value={stats.usersWithSavings}
+                    color="#ffebf0"
+                />
+            </div>
+
+            {/* Users Table */}
             <div className={styles.tableContainer}>
                 <table className={styles.usersTable}>
                     <thead>
                         <tr>
-                            <th>ORGANIZATION <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
-                            <th>USERNAME <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
-                            <th>EMAIL <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
-                            <th>PHONE NUMBER <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
-                            <th>DATE JOINED <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
-                            <th>STATUS <img src="/filter-icon.svg" className={styles.filterIcon} onClick={() => setShowFilter(true)} /></th>
+                            <th>
+                                ORGANIZATION
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
+                            <th>
+                                USERNAME
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
+                            <th>
+                                EMAIL
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
+                            <th>
+                                PHONE NUMBER
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
+                            <th>
+                                DATE JOINED
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
+                            <th>
+                                STATUS
+                                <img
+                                    src="/filter-icon.svg"
+                                    alt="Filter"
+                                    className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
+                                />
+                            </th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {paginatedUsers.map(user => (
-                            <tr key={user.id}>
+                        {getCurrentPageData().map((user) => (
+                            <tr
+                                key={user.id}
+                                className={styles.tableRow}
+                                onClick={() => handleViewDetails(user.id)}
+                            >
                                 <td>{user.organization}</td>
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{user.phone}</td>
-                                <td>{user.date}</td>
+                                <td>{formatDate(user.date)}</td>
                                 <td>
                                     <span className={`${styles.status} ${getStatusClass(user.status)}`}>
                                         {user.status}
                                     </span>
                                 </td>
                                 <td className={styles.menuCell}>
-                                    <button className={styles.menuButton} onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}>
+                                    <button
+                                        className={styles.menuButton}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedUser(selectedUser === user.id ? null : user.id);
+                                        }}
+                                    >
                                         <HiOutlineDotsVertical />
                                     </button>
                                     {selectedUser === user.id && (
                                         <div className={styles.userMenu}>
-                                            <button className={styles.menuItem}><FiEye /> View Details</button>
-                                            <button className={styles.menuItem}><FiUserX /> Blacklist User</button>
-                                            <button className={styles.menuItem}><FiUserCheckIcon /> Activate User</button>
+                                            <button
+                                                className={styles.menuItem}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleViewDetails(user.id);
+                                                }}
+                                            >
+                                                <FiEye /> View Details
+                                            </button>
+                                            <button
+                                                className={styles.menuItem}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <FiUserX /> Blacklist User
+                                            </button>
+                                            <button
+                                                className={styles.menuItem}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <FiUserCheckIcon /> Activate User
+                                            </button>
                                         </div>
                                     )}
                                 </td>
@@ -141,72 +544,80 @@ const Users: React.FC = () => {
                     </tbody>
                 </table>
 
-                {/* Pagination - Small */}
+                {/* Pagination */}
                 <div className={styles.pagination}>
                     <div className={styles.paginationInfo}>
                         <span>Showing</span>
-                        <span>100 out of 100</span>
+                        <select
+                            value={pagination.itemsPerPage}
+                            onChange={handleItemsPerPageChange}
+                        >
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                        <span>out of {pagination.totalItems}</span>
                     </div>
+
                     <div className={styles.paginationControls}>
-                        <button className={styles.paginationArrow} disabled>&lt;</button>
-                        <button className={`${styles.paginationPage} ${styles.active}`}>1</button>
-                        <button className={styles.paginationPage}>2</button>
-                        <button className={styles.paginationPage}>3</button>
-                        <span className={styles.paginationEllipsis}>...</span>
-                        <button className={styles.paginationPage}>15</button>
-                        <button className={styles.paginationPage}>16</button>
-                        <button className={styles.paginationArrow}>&gt;</button>
+                        <button
+                            onClick={() => handlePageChange(pagination.currentPage - 1)}
+                            disabled={pagination.currentPage === 1}
+                            className={styles.paginationArrow}
+                        >
+                            &lt;
+                        </button>
+
+                        {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
+                            let pageNum = i + 1;
+                            if (pagination.currentPage > 3 && pagination.totalPages > 5) {
+                                pageNum = pagination.currentPage - 3 + i;
+                            }
+                            if (pageNum <= pagination.totalPages && pageNum > 0) {
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => handlePageChange(pageNum)}
+                                        className={`${styles.paginationPage} ${pagination.currentPage === pageNum ? styles.active : ''}`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            }
+                            return null;
+                        })}
+
+                        {pagination.totalPages > 5 && pagination.currentPage < pagination.totalPages - 2 && (
+                            <>
+                                <span className={styles.paginationEllipsis}>...</span>
+                                <button
+                                    onClick={() => handlePageChange(pagination.totalPages)}
+                                    className={styles.paginationPage}
+                                >
+                                    {pagination.totalPages}
+                                </button>
+                            </>
+                        )}
+
+                        <button
+                            onClick={() => handlePageChange(pagination.currentPage + 1)}
+                            disabled={pagination.currentPage === pagination.totalPages}
+                            className={styles.paginationArrow}
+                        >
+                            &gt;
+                        </button>
                     </div>
                 </div>
             </div>
 
             {/* Filter Modal */}
             {showFilter && (
-                <div className={styles.filterOverlay} onClick={() => setShowFilter(false)}>
-                    <div className={styles.filterContainer} onClick={e => e.stopPropagation()}>
-                        <form className={styles.filterForm}>
-                            <div className={styles.filterGroup}>
-                                <label>Organization</label>
-                                <select className={styles.filterSelect}>
-                                    <option>Select</option>
-                                    <option>Lendsqr</option>
-                                    <option>Irorun</option>
-                                    <option>Lendstar</option>
-                                </select>
-                            </div>
-                            <div className={styles.filterGroup}>
-                                <label>Username</label>
-                                <input type="text" placeholder="User" className={styles.filterInput} />
-                            </div>
-                            <div className={styles.filterGroup}>
-                                <label>Email</label>
-                                <input type="email" placeholder="Email" className={styles.filterInput} />
-                            </div>
-                            <div className={styles.filterGroup}>
-                                <label>Date</label>
-                                <input type="date" className={styles.filterInput} />
-                            </div>
-                            <div className={styles.filterGroup}>
-                                <label>Phone Number</label>
-                                <input type="tel" placeholder="Phone Number" className={styles.filterInput} />
-                            </div>
-                            <div className={styles.filterGroup}>
-                                <label>Status</label>
-                                <select className={styles.filterSelect}>
-                                    <option>Select</option>
-                                    <option>Active</option>
-                                    <option>Inactive</option>
-                                    <option>Pending</option>
-                                    <option>Blacklisted</option>
-                                </select>
-                            </div>
-                            <div className={styles.filterButtons}>
-                                <button type="button" className={styles.resetButton}>Reset</button>
-                                <button type="submit" className={styles.filterButton}>Filter</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <Filter
+                    onFilter={handleFilter}
+                    onClose={() => setShowFilter(false)}
+                    organizations={organizations}
+                />
             )}
         </div>
     );
