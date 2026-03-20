@@ -1,6 +1,6 @@
 @use 'sass:color';
 
-// Variables
+// ── Variables ────────────────────────────────────────────────────────────────
 $primary-color: #213f7d;
 $secondary-color: #39cdcc;
 $text-primary: #213f7d;
@@ -11,19 +11,75 @@ $border-color: #e9edf5;
 $white: #ffffff;
 $shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
 $sidebar-width: 283px;
-$sidebar-width-collapsed: 80px;
-
-// Breakpoints
+$header-height: 100px;
+$header-height-mobile: 70px;
 $breakpoint-tablet: 768px;
-$breakpoint-desktop: 1024px;
 $breakpoint-large: 1280px;
 
+// ── Hamburger (mobile only) ───────────────────────────────────────────────────
+.hamburger {
+    display: none;
+
+    @media (max-width: $breakpoint-tablet) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 18px;
+        left: 16px;
+        z-index: 1100;
+        width: 36px;
+        height: 36px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: background 0.2s;
+
+        &:hover {
+            background: $active-bg;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+// ── Overlay (mobile only) ────────────────────────────────────────────────────
+.overlay {
+    display: none;
+
+    @media (max-width: $breakpoint-tablet) {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 998;
+        animation: fadeIn 0.2s ease;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ── Sidebar nav ──────────────────────────────────────────────────────────────
 .sidebar {
     position: fixed;
-    top: 100px; // Height of header
+    top: $header-height;
     left: 0;
     width: $sidebar-width;
-    height: calc(100vh - 100px);
+    height: calc(100vh - #{$header-height});
     background: $white;
     box-shadow: $shadow;
     overflow-y: auto;
@@ -31,73 +87,69 @@ $breakpoint-large: 1280px;
     z-index: 999;
     transition: transform 0.3s ease;
 
-    // Custom scrollbar
     &::-webkit-scrollbar {
         width: 4px;
     }
 
     &::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
-        background: $secondary-color;
+        background: rgba($secondary-color, 0.4);
         border-radius: 2px;
 
         &:hover {
-            background: color.adjust($secondary-color, $lightness: -5%);
+            background: $secondary-color;
         }
     }
 
     @media (max-width: $breakpoint-tablet) {
-        top: 70px;
-        height: calc(100vh - 70px);
+        top: $header-height-mobile;
+        height: calc(100vh - #{$header-height-mobile});
+        width: 260px;
         transform: translateX(-100%);
 
         &.open {
             transform: translateX(0);
+            box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
         }
     }
-}
 
-// Overlay for mobile
-.overlay {
-    display: none;
-
-    @media (max-width: $breakpoint-tablet) {
-        display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 998;
+    @media (min-width: $breakpoint-large) {
+        width: 300px;
     }
 }
 
+// ── Inner content wrapper ────────────────────────────────────────────────────
 .sidebarContent {
     display: flex;
     flex-direction: column;
     padding: 2rem 0;
+    min-height: 100%;
 }
 
-// Organization Switch
+// ── Switch Organization ───────────────────────────────────────────────────────
 .organizationSwitch {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0 1.5rem 1.5rem 1.5rem;
+    width: 100%;
+    padding: 0 1.5rem 1.5rem;
+    background: none;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    text-align: left;
+    transition: background 0.2s;
 
     &:hover {
-        background-color: $active-bg;
+        background: $active-bg;
     }
 
     .orgIcon {
-        color: $primary-color;
-        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
     }
 
     .orgText {
@@ -109,317 +161,197 @@ $breakpoint-large: 1280px;
     }
 
     .dropdownIcon {
-        color: $primary-color;
-        font-size: 16px;
-        transition: transform 0.3s ease;
-
-        &:hover {
-            transform: rotate(180deg);
-        }
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
     }
 }
 
-// Dashboard Link
+// ── Dashboard link ────────────────────────────────────────────────────────────
 .dashboardLink {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    width: 100%;
     padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    text-align: left;
     margin-bottom: 1.5rem;
+    transition: background 0.2s;
+    position: relative;
 
     &:hover {
-        background-color: $active-bg;
+        background: $active-bg;
+    }
+
+    &.active {
+        background: $active-bg;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: $secondary-color;
+        }
+
+        .dashboardText {
+            color: $primary-color;
+            font-weight: 600;
+        }
     }
 
     .dashboardIcon {
-        color: $primary-color;
-        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
     }
 
     .dashboardText {
         font-family: 'Work Sans', sans-serif;
         font-size: 16px;
         font-weight: 400;
-        color: $primary-color;
+        color: $text-secondary;
     }
 }
 
-// Menu Sections
+// ── Menu sections ─────────────────────────────────────────────────────────────
 .menuSections {
     flex: 1;
 }
 
 .menuSection {
     margin-bottom: 2rem;
-
-    .sectionTitle {
-        font-family: 'Work Sans', sans-serif;
-        font-size: 12px;
-        font-weight: 600;
-        color: $text-light;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        padding: 0 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .menuList {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-            margin-bottom: 0.25rem;
-        }
-    }
-
-    .menuItem {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        width: 100%;
-        padding: 0.75rem 1.5rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        color: $text-secondary;
-        font-family: 'Work Sans', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        text-align: left;
-
-        &:hover {
-            background-color: $active-bg;
-            color: $primary-color;
-        }
-
-        &.active {
-            background-color: $active-bg;
-            color: $primary-color;
-            font-weight: 500;
-            position: relative;
-
-            &::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 0;
-                height: 100%;
-                width: 3px;
-                background-color: $secondary-color;
-            }
-
-            .menuIcon {
-                color: $primary-color;
-            }
-        }
-
-        .menuIcon {
-            font-size: 18px;
-            color: $text-secondary;
-            transition: color 0.3s ease;
-            min-width: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .menuLabel {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .menuBadge {
-            background-color: $secondary-color;
-            color: $white;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            min-width: 24px;
-            text-align: center;
-        }
-    }
 }
 
-// Settings Pagination
-.settingsPagination {
+.sectionTitle {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0 1.5rem;
+    margin: 0 0 1rem;
+}
+
+.menuItem {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    margin: 1rem 0;
-    background-color: #fafafa;
-    border-top: 1px solid $border-color;
-    border-bottom: 1px solid $border-color;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: $text-secondary;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
 
-    .paginationInfo {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
+    &:hover {
+        background: $active-bg;
+        color: $primary-color;
+    }
 
-        .paginationLabel {
-            font-family: 'Work Sans', sans-serif;
-            font-size: 12px;
-            font-weight: 600;
-            color: $text-light;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
+    &.active {
+        background: $active-bg;
+        color: $primary-color;
+        font-weight: 600;
 
-        .paginationNumbers {
-            font-family: 'Work Sans', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            color: $primary-color;
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: $secondary-color;
+            border-radius: 0 2px 2px 0;
         }
     }
 
-    .paginationButton {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 0.3s ease;
+    // SVG img — no filter, renders with its own natural embedded colors
+    .menuIconImg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        display: block;
+    }
 
-        &:hover {
-            transform: translateY(2px);
-        }
+    .menuLabel {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-        .paginationIcon {
-            color: $primary-color;
-            font-size: 16px;
-        }
+    .menuBadge {
+        background: $secondary-color;
+        color: $white;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 0.15rem 0.45rem;
+        border-radius: 12px;
+        min-width: 22px;
+        text-align: center;
+        flex-shrink: 0;
     }
 }
 
-// Logout Section
+// ── Logout section ────────────────────────────────────────────────────────────
 .logoutSection {
-    padding: 1.5rem 1.5rem 0 1.5rem;
+    padding: 1.5rem 1.5rem 0;
     border-top: 1px solid $border-color;
     margin-top: auto;
+}
 
-    .logoutButton {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        width: 100%;
-        padding: 0.75rem 1rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: $text-secondary;
-        font-family: 'Work Sans', sans-serif;
-        font-size: 14px;
-        font-weight: 400;
-        border-radius: 8px;
+.logoutButton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-secondary;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
 
-        &:hover {
-            background-color: rgba(57, 205, 204, 0.1);
-            color: $secondary-color;
-
-            .logoutIcon {
-                color: $secondary-color;
-            }
-        }
-
-        .logoutIcon {
-            font-size: 18px;
-            color: $text-secondary;
-            transition: color 0.3s ease;
-        }
-
-        .logoutText {
-            flex: 1;
-            text-align: left;
-        }
+    &:hover {
+        background: rgba($secondary-color, 0.08);
+        color: $secondary-color;
     }
 
-    .versionText {
-        font-family: 'Work Sans', sans-serif;
-        font-size: 12px;
-        color: $text-light;
-        text-align: center;
-        margin-top: 1rem;
-        padding-top: 0.5rem;
-        border-top: 1px solid $border-color;
+    .logoutIcon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .logoutText {
+        flex: 1;
+        text-align: left;
     }
 }
 
-// Responsive adjustments
-@media (max-width: $breakpoint-tablet) {
-    .sidebar {
-        width: 260px;
-    }
-}
-
-@media (min-width: $breakpoint-large) {
-    .sidebar {
-        width: 300px;
-    }
-}
-
-// Active state styles for different sections
-:global(.dark-mode) {
-    .sidebar {
-        background: #1a1f2e;
-        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
-
-        .organizationSwitch,
-        .dashboardLink,
-        .menuItem {
-            color: #e0e0e0;
-
-            .orgIcon,
-            .dashboardIcon,
-            .menuIcon {
-                color: #e0e0e0;
-            }
-
-            &:hover {
-                background-color: rgba(57, 205, 204, 0.1);
-            }
-
-            &.active {
-                background-color: rgba(57, 205, 204, 0.15);
-                color: $secondary-color;
-
-                .menuIcon {
-                    color: $secondary-color;
-                }
-            }
-        }
-
-        .sectionTitle {
-            color: #8f9bb3;
-        }
-
-        .settingsPagination {
-            background-color: #1e2434;
-            border-color: #2a3040;
-
-            .paginationNumbers {
-                color: #e0e0e0;
-            }
-        }
-
-        .logoutButton {
-            color: #e0e0e0;
-
-            &:hover {
-                background-color: rgba(57, 205, 204, 0.1);
-                color: $secondary-color;
-            }
-        }
-    }
+.versionText {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px;
+    color: $text-light;
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid $border-color;
 }

@@ -10,7 +10,6 @@ import {
     type CachedUser,
 } from '../../components/Usercachedb';
 
-// ============ TYPES ============
 interface Guarantor {
     fullName: string;
     phoneNumber: string;
@@ -24,8 +23,16 @@ interface Socials {
     instagram: string;
 }
 
+interface AccountDetails {
+    accountNumber: string | number;
+    bank: string;
+    tier: number;
+    availableBalance: string;
+}
+
 export interface UserDetail {
     id: string;
+    loanId: string;
     name: string;
     email: string;
     phone: string;
@@ -45,6 +52,7 @@ export interface UserDetail {
     monthlyIncome: string;
     loanRepayment: string;
     socials: Socials;
+    accountDetails: AccountDetails;
     isActiveUser: boolean;
     hasLoan: boolean;
     hasSavings: boolean;
@@ -53,7 +61,6 @@ export interface UserDetail {
 }
 
 type TabKey = 'general' | 'documents' | 'bank' | 'loans' | 'savings' | 'app';
-type CacheStatus = 'fresh' | 'stale' | 'none';
 
 const TABS: { key: TabKey; label: string }[] = [
     { key: 'general', label: 'General Details' },
@@ -64,10 +71,11 @@ const TABS: { key: TabKey; label: string }[] = [
     { key: 'app', label: 'App and System' },
 ];
 
-// ============ NORMALISE RAW API RESPONSE ============
 function normaliseUser(raw: Record<string, unknown>): UserDetail {
+    const accountDetails = (raw.accountDetails ?? {}) as Record<string, unknown>;
     return {
         id: String(raw.id),
+        loanId: String(raw.loanId ?? ''),
         name: String(raw.name),
         email: String(raw.email),
         phone: String(raw.phone),
@@ -87,6 +95,12 @@ function normaliseUser(raw: Record<string, unknown>): UserDetail {
         monthlyIncome: String(raw.monthlyIncome),
         loanRepayment: String(raw.loanRepayment),
         socials: raw.socials as Socials,
+        accountDetails: {
+            accountNumber: String(accountDetails.accountNumber ?? ''),
+            bank: String(accountDetails.bank ?? ''),
+            tier: Number(accountDetails.tier ?? 1),
+            availableBalance: String(accountDetails.availableBalance ?? ''),
+        },
         isActiveUser: raw.isActiveUser === true || raw.isActiveUser === 'true',
         hasLoan: raw.hasLoan === true || raw.hasLoan === 'true',
         hasSavings: raw.hasSavings === true || raw.hasSavings === 'true',
@@ -95,7 +109,6 @@ function normaliseUser(raw: Record<string, unknown>): UserDetail {
     };
 }
 
-// ============ SUB-COMPONENTS ============
 const StarRating: React.FC<{ rating: number; max?: number }> = ({ rating, max = 3 }) => (
     <div className={styles.starRating}>
         {Array.from({ length: max }).map((_, i) => (
@@ -105,34 +118,24 @@ const StarRating: React.FC<{ rating: number; max?: number }> = ({ rating, max = 
 );
 
 const InfoField: React.FC<{ label: string; value: string }> = ({ label, value }) => (
-    <div className={styles.infoField}>
-        <span className={styles.infoLabel}>{label}</span>
-        <span className={styles.infoValue}>{value}</span>
-    </div>
+    <dl className={styles.infoField}>
+        <dt className={styles.infoLabel}>{label}</dt>
+        <dd className={styles.infoValue}>{value}</dd>
+    </dl>
 );
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-    <div className={styles.section}>
-        {title && <h3 className={styles.sectionTitle}>{title}</h3>}
+    <section className={styles.section}>
+        {title && <h2 className={styles.sectionTitle}>{title}</h2>}
         <div className={styles.sectionContent}>{children}</div>
-    </div>
+    </section>
 );
 
-const CacheBadge: React.FC<{ status: CacheStatus; revalidating: boolean }> = ({
-    status,
-    revalidating,
-}) => {
-    if (status === 'none') return null;
-    const label = revalidating ? '↻ Refreshing' : status === 'fresh' ? '✓ Cached' : '⚠ Stale';
-    const cls = revalidating
-        ? styles.cacheBadgeRevalidating
-        : status === 'fresh'
-            ? styles.cacheBadgeFresh
-            : styles.cacheBadgeStale;
-    return <span className={`${styles.cacheBadge} ${cls}`}>{label}</span>;
-};
+const capitalize = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+const formatResidence = (type: string) => type.split(' ').map(capitalize).join(' ');
+const formatBankName = (bank: string) =>
+    bank.charAt(0).toUpperCase() + bank.slice(1).toLowerCase() + ' Bank';
 
-// ============ MAIN COMPONENT ============
 const UserDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -141,13 +144,10 @@ const UserDetails: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabKey>('general');
-    const [cacheStatus, setCacheStatus] = useState<CacheStatus>('none');
-    const [revalidating, setRevalidating] = useState<boolean>(false);
 
     const fetchFromAPI = useCallback(
         async (userId: string, isBackground: boolean): Promise<UserDetail | null> => {
             try {
-                if (isBackground) setRevalidating(true);
                 const response = await axios.get<Record<string, unknown>>(
                     `http://localhost:3001/users/${userId}`,
                 );
@@ -156,8 +156,6 @@ const UserDetails: React.FC = () => {
                 return normalised;
             } catch {
                 return null;
-            } finally {
-                if (isBackground) setRevalidating(false);
             }
         },
         [],
@@ -173,11 +171,9 @@ const UserDetails: React.FC = () => {
             if (cached) {
                 setUser(cached.data);
                 setLoading(false);
-                const stale = isCacheStale(cached.cachedAt);
-                setCacheStatus(stale ? 'stale' : 'fresh');
-                if (stale) {
+                if (isCacheStale(cached.cachedAt)) {
                     const fresh = await fetchFromAPI(userId, true);
-                    if (fresh) { setUser(fresh); setCacheStatus('fresh'); }
+                    if (fresh) setUser(fresh);
                 }
                 return;
             }
@@ -185,7 +181,6 @@ const UserDetails: React.FC = () => {
             const fresh = await fetchFromAPI(userId, false);
             if (fresh) {
                 setUser(fresh);
-                setCacheStatus('fresh');
             } else {
                 setError('Failed to load user details. Please check your connection and try again.');
             }
@@ -198,16 +193,6 @@ const UserDetails: React.FC = () => {
         if (id !== undefined) loadUser(id);
     }, [id, loadUser]);
 
-    const handleForceRefresh = async () => {
-        if (!id) return;
-        const fresh = await fetchFromAPI(id, true);
-        if (fresh) { setUser(fresh); setCacheStatus('fresh'); }
-    };
-
-    const capitalize = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
-    const formatResidence = (type: string) => type.split(' ').map(capitalize).join(' ');
-
-    // ---- Loading & error states — still need the shell so layout doesn't flash ----
     if (loading) {
         return (
             <div className={styles.loadingContainer}>
@@ -226,32 +211,24 @@ const UserDetails: React.FC = () => {
         );
     }
 
-    // ---- Render: success ----
+    const { accountDetails } = user;
+
     return (
-        <div className={styles.container}>
+        <main className={styles.container}>
             <button className={styles.backButton} onClick={() => navigate(-1)}>
                 <FiArrowLeft />
                 <span>Back to Users</span>
             </button>
 
-            <div className={styles.pageHeader}>
+            <header className={styles.pageHeader}>
                 <h1>User Details</h1>
                 <div className={styles.headerActions}>
-                    <CacheBadge status={cacheStatus} revalidating={revalidating} />
-                    <button
-                        className={styles.btnRefresh}
-                        onClick={handleForceRefresh}
-                        disabled={revalidating}
-                        title="Force refresh from server"
-                    >
-                        ↻
-                    </button>
                     <button className={styles.btnBlacklist}>BLACKLIST USER</button>
                     <button className={styles.btnActivate}>ACTIVATE USER</button>
                 </div>
-            </div>
+            </header>
 
-            <div className={styles.profileCard}>
+            <article className={styles.profileCard}>
                 <div className={styles.profileTop}>
                     <div className={styles.avatar}>
                         <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -261,25 +238,27 @@ const UserDetails: React.FC = () => {
                     </div>
                     <div className={styles.profileInfo}>
                         <h2 className={styles.profileName}>{user.name}</h2>
-                        <p className={styles.profileId}>LSQFf{user.id}g90</p>
+                        <p className={styles.profileId}>{user.loanId}</p>
                     </div>
 
                     <div className={styles.divider} />
 
                     <div className={styles.tierInfo}>
-                        <p className={styles.tierLabel}>User&apos;s Tier</p>
-                        <StarRating rating={1} max={3} />
+                        <p className={styles.tierLabel}>User's Tier</p>
+                        <StarRating rating={accountDetails.tier} max={3} />
                     </div>
 
                     <div className={styles.divider} />
 
                     <div className={styles.balanceInfo}>
-                        <p className={styles.balanceAmount}>₦200,000.00</p>
-                        <p className={styles.bankInfo}>9912345678/Providus Bank</p>
+                        <p className={styles.balanceAmount}>{accountDetails.availableBalance}</p>
+                        <p className={styles.bankInfo}>
+                            {accountDetails.accountNumber}/{formatBankName(accountDetails.bank)}
+                        </p>
                     </div>
                 </div>
 
-                <div className={styles.tabs}>
+                <nav className={styles.tabs}>
                     {TABS.map((tab) => (
                         <button
                             key={tab.key}
@@ -289,87 +268,86 @@ const UserDetails: React.FC = () => {
                             {tab.label}
                         </button>
                     ))}
-                </div>
-            </div>
+                </nav>
+            </article>
 
-            {activeTab === 'general' && (
-                <div className={styles.detailsCard}>
-                    <Section title="Personal Information">
-                        <div className={styles.grid5}>
-                            <InfoField label="FULL NAME" value={user.name} />
-                            <InfoField label="PHONE NUMBER" value={user.phone} />
-                            <InfoField label="EMAIL ADDRESS" value={user.email} />
-                            <InfoField label="BVN" value={String(user.bvn)} />
-                            <InfoField label="GENDER" value={capitalize(user.gender)} />
-                        </div>
-                        <div className={styles.grid3}>
-                            <InfoField label="MARITAL STATUS" value={capitalize(user.maritalStatus)} />
-                            <InfoField
-                                label="CHILDREN"
-                                value={user.children === 0 ? 'None' : String(user.children)}
-                            />
-                            <InfoField label="TYPE OF RESIDENCE" value={formatResidence(user.residenceType)} />
-                        </div>
-                    </Section>
+            <div>
+                {activeTab === 'general' && (
+                    <div className={styles.detailsCard}>
+                        <Section title="Personal Information">
+                            <div className={styles.grid5}>
+                                <InfoField label="FULL NAME" value={user.name} />
+                                <InfoField label="PHONE NUMBER" value={user.phone} />
+                                <InfoField label="EMAIL ADDRESS" value={user.email} />
+                                <InfoField label="BVN" value={String(user.bvn)} />
+                                <InfoField label="GENDER" value={capitalize(user.gender)} />
+                            </div>
+                            <div className={styles.gridRow}>
+                                <InfoField label="MARITAL STATUS" value={capitalize(user.maritalStatus)} />
+                                <InfoField label="CHILDREN" value={user.children === 0 ? 'None' : String(user.children)} />
+                                <InfoField label="TYPE OF RESIDENCE" value={formatResidence(user.residenceType)} />
+                            </div>
+                        </Section>
 
-                    <div className={styles.sectionDivider} />
+                        <hr className={styles.sectionDivider} />
 
-                    <Section title="Education and Employment">
-                        <div className={styles.grid4}>
-                            <InfoField label="LEVEL OF EDUCATION" value={capitalize(user.educationLevel)} />
-                            <InfoField label="EMPLOYMENT STATUS" value={capitalize(user.employmentStatus)} />
-                            <InfoField label="SECTOR OF EMPLOYMENT" value={capitalize(user.sectorOfEmployment)} />
-                            <InfoField label="DURATION OF EMPLOYMENT" value={user.durationOfEmployment} />
-                        </div>
-                        <div className={styles.grid3}>
-                            <InfoField label="OFFICE EMAIL" value={user.officeEmail} />
-                            <InfoField label="MONTHLY INCOME" value={user.monthlyIncome} />
-                            <InfoField label="LOAN REPAYMENT" value={user.loanRepayment} />
-                        </div>
-                    </Section>
+                        <Section title="Education and Employment">
+                            <div className={styles.grid4}>
+                                <InfoField label="LEVEL OF EDUCATION" value={capitalize(user.educationLevel)} />
+                                <InfoField label="EMPLOYMENT STATUS" value={capitalize(user.employmentStatus)} />
+                                <InfoField label="SECTOR OF EMPLOYMENT" value={capitalize(user.sectorOfEmployment)} />
+                                <InfoField label="DURATION OF EMPLOYMENT" value={user.durationOfEmployment} />
+                            </div>
+                            <div className={styles.gridRow}>
+                                <InfoField label="OFFICE EMAIL" value={user.officeEmail} />
+                                <InfoField label="MONTHLY INCOME" value={user.monthlyIncome} />
+                                <InfoField label="LOAN REPAYMENT" value={user.loanRepayment} />
+                            </div>
+                        </Section>
 
-                    <div className={styles.sectionDivider} />
+                        <hr className={styles.sectionDivider} />
 
-                    <Section title="Socials">
-                        <div className={styles.grid3}>
-                            <InfoField label="TWITTER" value={user.socials.twitter} />
-                            <InfoField label="FACEBOOK" value={user.socials.facebook} />
-                            <InfoField label="INSTAGRAM" value={user.socials.instagram} />
-                        </div>
-                    </Section>
+                        <Section title="Socials">
+                            <div className={styles.grid3}>
+                                <InfoField label="TWITTER" value={user.socials.twitter} />
+                                <InfoField label="FACEBOOK" value={user.socials.facebook} />
+                                <InfoField label="INSTAGRAM" value={user.socials.instagram} />
+                            </div>
+                        </Section>
 
-                    <div className={styles.sectionDivider} />
+                        <hr className={styles.sectionDivider} />
 
-                    <Section title="Guarantor">
-                        <div className={styles.grid4}>
-                            <InfoField label="FULL NAME" value={user.guarantor1.fullName} />
-                            <InfoField label="PHONE NUMBER" value={user.guarantor1.phoneNumber} />
-                            <InfoField label="EMAIL ADDRESS" value={user.guarantor1.email} />
-                            <InfoField label="RELATIONSHIP" value={capitalize(user.guarantor1.relationship)} />
-                        </div>
-                    </Section>
+                        <Section title="Guarantor">
+                            <div className={styles.grid4}>
+                                <InfoField label="FULL NAME" value={user.guarantor1.fullName} />
+                                <InfoField label="PHONE NUMBER" value={user.guarantor1.phoneNumber} />
+                                <InfoField label="EMAIL ADDRESS" value={user.guarantor1.email} />
+                                <InfoField label="RELATIONSHIP" value={capitalize(user.guarantor1.relationship)} />
+                            </div>
+                        </Section>
 
-                    <div className={styles.sectionDivider} />
+                        <hr className={styles.sectionDivider} />
 
-                    <Section title="">
-                        <div className={styles.grid4}>
-                            <InfoField label="FULL NAME" value={user.guarantor2.fullName} />
-                            <InfoField label="PHONE NUMBER" value={user.guarantor2.phoneNumber} />
-                            <InfoField label="EMAIL ADDRESS" value={user.guarantor2.email} />
-                            <InfoField label="RELATIONSHIP" value={capitalize(user.guarantor2.relationship)} />
-                        </div>
-                    </Section>
-                </div>
-            )}
-
-            {activeTab !== 'general' && (
-                <div className={styles.detailsCard}>
-                    <div className={styles.emptyTab}>
-                        <p>No {TABS.find((t) => t.key === activeTab)?.label} data available.</p>
+                        <Section title="">
+                            <div className={styles.grid4}>
+                                <InfoField label="FULL NAME" value={user.guarantor2.fullName} />
+                                <InfoField label="PHONE NUMBER" value={user.guarantor2.phoneNumber} />
+                                <InfoField label="EMAIL ADDRESS" value={user.guarantor2.email} />
+                                <InfoField label="RELATIONSHIP" value={capitalize(user.guarantor2.relationship)} />
+                            </div>
+                        </Section>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+
+                {activeTab !== 'general' && (
+                    <div className={styles.detailsCard}>
+                        <div className={styles.emptyTab}>
+                            <p>No {TABS.find((t) => t.key === activeTab)?.label} data available.</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </main>
     );
 };
 

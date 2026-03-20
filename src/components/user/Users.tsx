@@ -9,8 +9,7 @@ import {
     FiUserX,
     FiUserCheck as FiUserCheckIcon,
 } from 'react-icons/fi';
-import { BsPiggyBank } from 'react-icons/bs';
-import { MdOutlineAccountBalanceWallet } from 'react-icons/md';
+
 import { HiOutlineDotsVertical } from 'react-icons/hi';
 
 // ============ TYPES ============
@@ -399,25 +398,25 @@ const Users: React.FC = () => {
             {/* Stats Grid */}
             <div className={styles.statsGrid}>
                 <StatCard
-                    icon={<FiUsers />}
+                    icon={<img src="/icons/users.svg" alt="Users" className={styles.statIcon} />}
                     label="USERS"
                     value={stats.totalUsers}
                     color="#fce8ff"
                 />
                 <StatCard
-                    icon={<FiUserCheck />}
+                    icon={<img src="/icons/active-users.svg" alt="Active Users" className={styles.statIcon} />}
                     label="ACTIVE USERS"
                     value={stats.activeUsers}
                     color="#eee8ff"
                 />
                 <StatCard
-                    icon={<BsPiggyBank />}
+                    icon={<img src="/icons/loans.svg" alt="Users with Loans" className={styles.statIcon} />}
                     label="USERS WITH LOANS"
                     value={stats.usersWithLoans}
                     color="#feefec"
                 />
                 <StatCard
-                    icon={<MdOutlineAccountBalanceWallet />}
+                    icon={<img src="/icons/savings.svg" alt="Users with Savings" className={styles.statIcon} />}
                     label="USERS WITH SAVINGS"
                     value={stats.usersWithSavings}
                     color="#ffebf0"

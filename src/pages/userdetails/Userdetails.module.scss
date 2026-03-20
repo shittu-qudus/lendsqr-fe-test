@@ -1,6 +1,3 @@
-// ============ UserDetails.module.scss ============
-// Color tokens matching the Lendsqr design system
-
 $primary: #39cdcc;
 $primary-dark: #213f7d;
 $danger: #e4033b;
@@ -13,13 +10,6 @@ $border: #e5e5e5;
 $star-fill: #e9b200;
 $star-empty: #c8cacd;
 
-// Status colors
-$status-active-bg: rgba(57, 205, 98, 0.06);
-$status-active-color: #39cd62;
-
-// ============ PAGE CONTAINER ============
-// DashboardLayout owns the shell (header + sidebar + scroll).
-// .container is just the inner page padding — no positioning needed.
 .container {
     padding: 32px 40px;
     background: $bg-page;
@@ -30,7 +20,6 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ BACK BUTTON ============
 .backButton {
     display: inline-flex;
     align-items: center;
@@ -43,7 +32,6 @@ $status-active-color: #39cd62;
     font-family: inherit;
     padding: 0;
     margin-bottom: 24px;
-    transition: opacity 0.2s;
 
     &:hover {
         opacity: 0.7;
@@ -54,7 +42,6 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ PAGE HEADER ============
 .pageHeader {
     display: flex;
     align-items: center;
@@ -77,72 +64,6 @@ $status-active-color: #39cd62;
     align-items: center;
 }
 
-// ============ CACHE BADGE ============
-.cacheBadge {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-}
-
-.cacheBadgeFresh {
-    background: rgba(57, 205, 98, 0.1);
-    color: #39cd62;
-}
-
-.cacheBadgeStale {
-    background: rgba(233, 178, 0, 0.12);
-    color: #b58900;
-}
-
-.cacheBadgeRevalidating {
-    background: rgba(57, 205, 204, 0.1);
-    color: $primary;
-    animation: pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
-
-// ============ REFRESH BUTTON ============
-.btnRefresh {
-    width: 34px;
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: 1px solid $border;
-    border-radius: 6px;
-    font-size: 16px;
-    color: $text-label;
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover:not(:disabled) {
-        border-color: $primary;
-        color: $primary;
-        transform: rotate(30deg);
-    }
-
-    &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-}
-
 .btnBlacklist {
     padding: 10px 20px;
     border: 1px solid $danger;
@@ -154,7 +75,6 @@ $status-active-color: #39cd62;
     font-family: inherit;
     letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
 
     &:hover {
         background: $danger;
@@ -173,7 +93,6 @@ $status-active-color: #39cd62;
     font-family: inherit;
     letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
 
     &:hover {
         background: $primary;
@@ -181,7 +100,6 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ PROFILE CARD ============
 .profileCard {
     background: $bg-card;
     border-radius: 4px;
@@ -193,7 +111,6 @@ $status-active-color: #39cd62;
 .profileTop {
     display: flex;
     align-items: center;
-    gap: 0;
     padding: 32px 40px 0;
     flex-wrap: wrap;
     gap: 24px;
@@ -244,7 +161,6 @@ $status-active-color: #39cd62;
     width: 1px;
     height: 72px;
     background: $border;
-    flex-shrink: 0;
 
     @media (max-width: 768px) {
         display: none;
@@ -298,15 +214,12 @@ $status-active-color: #39cd62;
     margin: 0;
 }
 
-// ============ TABS ============
 .tabs {
     display: flex;
     margin-top: 28px;
     padding: 0 40px;
     border-bottom: 1px solid $border;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
 
     &::-webkit-scrollbar {
         display: none;
@@ -327,7 +240,6 @@ $status-active-color: #39cd62;
     font-family: inherit;
     color: $text-label;
     white-space: nowrap;
-    transition: color 0.2s, border-color 0.2s;
     margin-bottom: -1px;
 
     &:hover {
@@ -341,7 +253,6 @@ $status-active-color: #39cd62;
     font-weight: 500;
 }
 
-// ============ DETAILS CARD ============
 .detailsCard {
     background: $bg-card;
     border-radius: 4px;
@@ -353,7 +264,6 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ SECTION ============
 .section {
     margin-bottom: 0;
 }
@@ -368,20 +278,20 @@ $status-active-color: #39cd62;
 .sectionContent {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 28px;
 }
 
 .sectionDivider {
     border: none;
     border-top: 1px solid $border;
-    margin: 28px 0;
+    margin: 32px 0;
 }
 
-// ============ INFO GRIDS ============
 .grid5 {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 28px 16px;
+    column-gap: 16px;
+    row-gap: 28px;
 
     @media (max-width: 1024px) {
         grid-template-columns: repeat(3, 1fr);
@@ -395,7 +305,8 @@ $status-active-color: #39cd62;
 .grid4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 28px 16px;
+    column-gap: 16px;
+    row-gap: 28px;
 
     @media (max-width: 1024px) {
         grid-template-columns: repeat(3, 1fr);
@@ -406,10 +317,15 @@ $status-active-color: #39cd62;
     }
 }
 
-.grid3 {
+.gridRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 28px 16px;
+    column-gap: 16px;
+    row-gap: 28px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
 
     @media (max-width: 768px) {
         grid-template-columns: repeat(2, 1fr);
@@ -420,11 +336,27 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ INFO FIELD ============
+.grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 16px;
+    row-gap: 28px;
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
 .infoField {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin: 0;
+    padding: 0;
 }
 
 .infoLabel {
@@ -433,6 +365,8 @@ $status-active-color: #39cd62;
     color: $text-label;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    margin: 0;
+    padding: 0;
 }
 
 .infoValue {
@@ -440,9 +374,10 @@ $status-active-color: #39cd62;
     font-weight: 500;
     color: $text-main;
     word-break: break-word;
+    margin: 0;
+    padding: 0;
 }
 
-// ============ EMPTY TAB ============
 .emptyTab {
     display: flex;
     justify-content: center;
@@ -455,7 +390,6 @@ $status-active-color: #39cd62;
     }
 }
 
-// ============ LOADING & ERROR ============
 .loadingContainer {
     display: flex;
     flex-direction: column;
@@ -501,7 +435,6 @@ $status-active-color: #39cd62;
         cursor: pointer;
         font-size: 14px;
         font-family: inherit;
-        transition: opacity 0.2s;
 
         &:hover {
             opacity: 0.85;

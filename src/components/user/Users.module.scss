@@ -27,6 +27,12 @@ $breakpoint-large: 1280px;
     padding: 0;
 }
 
+.statIcon {
+    width: 24px;
+    height: 24px;
+    color: #545f7d; // only works if SVG uses fill="currentColor"
+}
+
 // Page Header
 .pageHeader {
     margin-bottom: 24px;
@@ -44,17 +50,15 @@ $breakpoint-large: 1280px;
 .statsGrid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 24px;
+    margin-bottom: 32px;
 
     @media (max-width: $breakpoint-desktop) {
         grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
     }
 
-    @media (max-width: $breakpoint-tablet) {
-        grid-template-columns: 1fr;
-        gap: 12px;
+    @media (max-width: $breakpoint-mobile) {
+        grid-template-columns: 2;
     }
 }
 

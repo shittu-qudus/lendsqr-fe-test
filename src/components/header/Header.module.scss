@@ -18,7 +18,7 @@ $breakpoint-desktop: 1024px;
 $breakpoint-large: 1280px;
 
 .header {
-    position: fixed; // Changed from sticky to fixed
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -50,6 +50,13 @@ $breakpoint-large: 1280px;
 // Logo Section
 .logoSection {
     flex-shrink: 0;
+    display: flex;
+    justify-content: flex-start;
+
+    @media (max-width: $breakpoint-tablet) {
+        flex: 1;
+        justify-content: center; // center logo on mobile
+    }
 
     .logo {
         width: 144.8px;
@@ -75,7 +82,7 @@ $breakpoint-large: 1280px;
     }
 
     @media (max-width: $breakpoint-tablet) {
-        display: none;
+        display: none; // hidden on mobile
     }
 
     .searchForm {
@@ -327,93 +334,14 @@ $breakpoint-large: 1280px;
     }
 }
 
-// Mobile Menu Button
+// Mobile Menu Button — hidden everywhere
 .mobileMenuButton {
     display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-
-    @media (max-width: $breakpoint-tablet) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .menuIcon {
-        color: $primary-color;
-        font-size: 28px;
-        transition: color 0.3s ease;
-
-        &:hover {
-            color: $secondary-color;
-        }
-    }
 }
 
-// Mobile Menu
+// Mobile Menu — hidden everywhere
 .mobileMenu {
     display: none;
-
-    @media (max-width: $breakpoint-tablet) {
-        display: block;
-        padding: 1rem;
-        background: $white;
-        border-top: 1px solid $border-color;
-        animation: slideDown 0.3s ease;
-    }
-
-    .mobileSearch {
-        width: 100%;
-
-        .mobileSearchForm {
-            display: flex;
-            align-items: center;
-            height: 45px;
-            background: $input-bg;
-            border: 1px solid $border-color;
-            border-radius: 8px;
-            overflow: hidden;
-
-            .mobileSearchInput {
-                flex: 1;
-                height: 100%;
-                padding: 0 1rem;
-                border: none;
-                background: transparent;
-                font-size: 14px;
-                color: $text-primary;
-                outline: none;
-
-                &::placeholder {
-                    color: $text-secondary;
-                    opacity: 0.7;
-                }
-            }
-
-            .mobileSearchButton {
-                width: 56px;
-                height: 100%;
-                background: $secondary-color;
-                border: none;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: background-color 0.3s ease;
-
-                &:hover {
-                    background: color.adjust($secondary-color, $lightness: -5%);
-                }
-
-                .mobileSearchIcon {
-                    color: $white;
-                    font-size: 18px;
-                }
-            }
-        }
-    }
 }
 
 // Animations
