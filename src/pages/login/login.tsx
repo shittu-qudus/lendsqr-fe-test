@@ -1,6 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import styles from './Login.module.scss';
 import { useNavigate } from 'react-router-dom';
+
+
+const LazyIllustration: React.FC = () => (
+  <img
+    src="/image.png"
+    alt="Person managing finances online"
+    className={styles.illustration}
+    loading="lazy"
+    decoding="async"
+    width={600}
+    height={530}
+  />
+);
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -19,26 +32,36 @@ const Login: React.FC = () => {
     }
 
     setError('');
-    console.log('Logging in with:', { email, password });
     navigate('/dashboard');
   };
 
   return (
     <main className={styles.loginContainer}>
 
+      {/* Left — branding & illustration */}
       <section className={styles.leftSection} aria-label="Branding">
-        <header className={styles.logoWrapper} style={{ paddingLeft: '30px' }}>
-          <img src="/logo.png" alt="Lendsqr" className={styles.logo} />
+        <header className={styles.logoWrapper}>
+          <img
+            src="/logo.png"
+            alt="Lendsqr"
+            className={styles.logo}
+            width={174}
+            height={36}
+            fetchPriority="high"
+          />
         </header>
         <figure className={styles.illustrationWrapper}>
-          <img src="/image.png" alt="Person managing finances online" className={styles.illustration} />
+          <Suspense fallback={<div className={styles.illustrationPlaceholder} />}>
+            <LazyIllustration />
+          </Suspense>
         </figure>
       </section>
 
+      {/* Right — login form */}
       <section className={styles.rightSection} aria-label="Login">
         <div className={styles.formWrapper}>
           <h1 className={styles.welcomeTitle}>Welcome!</h1>
-          <p className={styles.subtitle} id="login-subtitle">Enter details to login.</p>
+          <p className={styles.subtitle}>Enter details to login.</p>
 
           {error && (
             <p role="alert" aria-live="assertive" className={styles.errorMessage}>

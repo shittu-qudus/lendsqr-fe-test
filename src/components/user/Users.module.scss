@@ -1,39 +1,31 @@
 @use 'sass:color';
 
-// Variables
+// ── Variables ──────────────────────────────────────────────
 $primary-color: #213f7d;
 $secondary-color: #39cdcc;
 $text-primary: #213f7d;
 $text-secondary: #545f7d;
-$text-light: #7a8a9e;
 $border-color: rgba(33, 63, 125, 0.1);
 $white: #ffffff;
 $background: #f5f5f7;
 
-// Status colors
 $status-active: #39cd62;
 $status-pending: #e9b200;
 $status-blacklisted: #e4033b;
 $status-inactive: #545f7d;
 
-// Breakpoints
-$breakpoint-mobile: 480px;
-$breakpoint-tablet: 768px;
-$breakpoint-desktop: 1024px;
-$breakpoint-large: 1280px;
+// ── Breakpoints ────────────────────────────────────────────
+$bp-mobile-max: 479px;
+$bp-tablet-max: 767px;
+$bp-desktop-max: 1023px;
 
+// ── Container ──────────────────────────────────────────────
 .usersContainer {
     width: 100%;
     padding: 0;
 }
 
-.statIcon {
-    width: 10px;
-    height: 10px;
-    color: #545f7d;
-}
-
-// Page Header
+// ── Page Header ────────────────────────────────────────────
 .pageHeader {
     margin-bottom: 24px;
 
@@ -43,22 +35,29 @@ $breakpoint-large: 1280px;
         font-weight: 500;
         color: $primary-color;
         margin: 0;
+
+        @media (max-width: $bp-mobile-max) {
+            font-size: 20px;
+        }
     }
 }
 
-// Stats Grid
+// ── Stats Grid ─────────────────────────────────────────────
 .statsGrid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
     margin-bottom: 32px;
 
-    @media (max-width: $breakpoint-desktop) {
+    @media (max-width: $bp-desktop-max) {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
 
-    @media (max-width: $breakpoint-mobile) {
-        grid-template-columns: 2;
+    @media (max-width: $bp-mobile-max) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
     }
 }
 
@@ -78,6 +77,17 @@ $breakpoint-large: 1280px;
         object-fit: contain;
         display: block;
     }
+
+    @media (max-width: $bp-mobile-max) {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+
+        img {
+            width: 22px;
+            height: 22px;
+        }
+    }
 }
 
 .statCard {
@@ -88,10 +98,13 @@ $breakpoint-large: 1280px;
     border: 1px solid $border-color;
     transition: all 0.2s ease;
 
-
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
         transform: translateY(-2px);
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 14px 12px;
     }
 
     .statIcon {
@@ -117,6 +130,10 @@ $breakpoint-large: 1280px;
         text-transform: uppercase;
         margin-bottom: 6px;
         letter-spacing: 0.3px;
+
+        @media (max-width: $bp-mobile-max) {
+            font-size: 10px;
+        }
     }
 
     .statValue {
@@ -126,16 +143,21 @@ $breakpoint-large: 1280px;
         color: $primary-color;
         margin: 0;
         line-height: 1.2;
+
+        @media (max-width: $bp-mobile-max) {
+            font-size: 16px;
+        }
     }
 }
 
-// Table Container
+// ── Table Container ────────────────────────────────────────
 .tableContainer {
     background: $white;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     border: 1px solid $border-color;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch; // smooth scroll on iOS
     width: 100%;
 
     &::-webkit-scrollbar {
@@ -156,7 +178,7 @@ $breakpoint-large: 1280px;
     width: 100%;
     border-collapse: collapse;
     font-family: 'Work Sans', sans-serif;
-    min-width: 1000px;
+    min-width: 800px; // enables horizontal scroll on small screens
 
     th {
         font-size: 11px;
@@ -196,120 +218,122 @@ $breakpoint-large: 1280px;
 
     tbody tr {
         transition: background 0.2s ease;
+        cursor: pointer;
 
         &:hover {
             background: rgba($secondary-color, 0.02);
         }
     }
+}
 
-    // Status Badges
-    .status {
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 100px;
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: capitalize;
-        min-width: 75px;
-        text-align: center;
+// ── Status Badges ──────────────────────────────────────────
+.status {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: capitalize;
+    min-width: 75px;
+    text-align: center;
+}
+
+.statusActive {
+    background: rgba($status-active, 0.1);
+    color: $status-active;
+}
+
+.statusPending {
+    background: rgba($status-pending, 0.1);
+    color: $status-pending;
+}
+
+.statusBlacklisted {
+    background: rgba($status-blacklisted, 0.1);
+    color: $status-blacklisted;
+}
+
+.statusInactive {
+    background: rgba($status-inactive, 0.1);
+    color: $status-inactive;
+}
+
+// ── Menu Cell ──────────────────────────────────────────────
+.menuCell {
+    position: relative;
+    width: 40px;
+    text-align: center;
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-secondary;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+        background: rgba($secondary-color, 0.1);
+        color: $secondary-color;
     }
 
-    .statusActive {
-        background: rgba($status-active, 0.1);
-        color: $status-active;
+    svg {
+        font-size: 16px;
     }
+}
 
-    .statusPending {
-        background: rgba($status-pending, 0.1);
-        color: $status-pending;
-    }
+.userMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: $white;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    min-width: 160px;
+    z-index: 100;
+    border: 1px solid $border-color;
+    animation: fadeIn 0.2s ease;
 
-    .statusBlacklisted {
-        background: rgba($status-blacklisted, 0.1);
-        color: $status-blacklisted;
-    }
-
-    .statusInactive {
-        background: rgba($status-inactive, 0.1);
-        color: $status-inactive;
-    }
-
-    // Menu Cell
-    .menuCell {
-        position: relative;
-        width: 40px;
-        text-align: center;
-    }
-
-    .menuButton {
+    .menuItem {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 16px;
         background: none;
         border: none;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 12px;
+        color: $text-primary;
         cursor: pointer;
-        padding: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: $text-secondary;
         transition: all 0.2s ease;
-        border-radius: 4px;
-
-        &:hover {
-            background: rgba($secondary-color, 0.1);
-            color: $secondary-color;
-        }
+        text-align: left;
+        -webkit-tap-highlight-color: transparent;
 
         svg {
-            font-size: 16px;
+            font-size: 14px;
+            color: $text-secondary;
         }
-    }
 
-    // User Menu Dropdown
-    .userMenu {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: $white;
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 4px 0;
-        min-width: 160px;
-        z-index: 100;
-        border: 1px solid $border-color;
-        animation: fadeIn 0.2s ease;
-
-        .menuItem {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 10px 16px;
-            background: none;
-            border: none;
-            font-family: 'Work Sans', sans-serif;
-            font-size: 12px;
-            color: $text-primary;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
+        &:hover {
+            background: rgba($secondary-color, 0.05);
+            color: $secondary-color;
 
             svg {
-                font-size: 14px;
-                color: $text-secondary;
-            }
-
-            &:hover {
-                background: rgba($secondary-color, 0.05);
                 color: $secondary-color;
-
-                svg {
-                    color: $secondary-color;
-                }
             }
         }
     }
 }
 
-// Pagination
+// ── Pagination ─────────────────────────────────────────────
 .pagination {
     display: flex;
     justify-content: space-between;
@@ -317,95 +341,104 @@ $breakpoint-large: 1280px;
     padding: 16px 20px;
     border-top: 1px solid $border-color;
     font-size: 13px;
+    flex-wrap: wrap;
+    gap: 12px;
 
-    @media (max-width: $breakpoint-tablet) {
+    @media (max-width: $bp-tablet-max) {
         flex-direction: column;
-        gap: 12px;
         align-items: flex-start;
-    }
-
-    .paginationInfo {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: $text-secondary;
-
-        select {
-            padding: 5px 8px;
-            border: 1px solid $border-color;
-            border-radius: 4px;
-            font-family: 'Work Sans', sans-serif;
-            font-size: 12px;
-            color: $text-primary;
-            outline: none;
-            cursor: pointer;
-            background: $white;
-
-            &:focus {
-                border-color: $secondary-color;
-            }
-        }
-
-        span {
-            color: $text-secondary;
-            font-size: 12px;
-        }
-    }
-
-    .paginationControls {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        .paginationArrow,
-        .paginationPage {
-            min-width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid $border-color;
-            background: $white;
-            font-family: 'Work Sans', sans-serif;
-            font-size: 12px;
-            color: $text-secondary;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-radius: 4px;
-
-            &:hover:not(:disabled) {
-                background: $secondary-color;
-                color: $white;
-                border-color: $secondary-color;
-            }
-
-            &:disabled {
-                opacity: 0.4;
-                cursor: not-allowed;
-            }
-
-            &.active {
-                background: $secondary-color;
-                color: $white;
-                border-color: $secondary-color;
-            }
-        }
-
-        .paginationEllipsis {
-            color: $text-secondary;
-            padding: 0 4px;
-            font-size: 12px;
-        }
+        padding: 12px 16px;
     }
 }
 
-// Filter Modal
+.paginationInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $text-secondary;
+
+    select {
+        padding: 5px 8px;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        font-family: 'Work Sans', sans-serif;
+        font-size: 12px;
+        color: $text-primary;
+        outline: none;
+        cursor: pointer;
+        background: $white;
+        -webkit-appearance: none;
+        appearance: none;
+
+        &:focus {
+            border-color: $secondary-color;
+        }
+    }
+
+    span {
+        color: $text-secondary;
+        font-size: 12px;
+    }
+}
+
+.paginationControls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.paginationArrow,
+.paginationPage {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $border-color;
+    background: $white;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 12px;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:hover:not(:disabled) {
+        background: $secondary-color;
+        color: $white;
+        border-color: $secondary-color;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    &.active {
+        background: $secondary-color;
+        color: $white;
+        border-color: $secondary-color;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        min-width: 36px;
+        height: 36px;
+    }
+}
+
+.paginationEllipsis {
+    color: $text-secondary;
+    padding: 0 4px;
+    font-size: 12px;
+}
+
+// ── Filter Modal ───────────────────────────────────────────
 .filterOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: transparent;
     z-index: 9999;
 }
@@ -437,10 +470,18 @@ $breakpoint-large: 1280px;
         border-radius: 2px;
     }
 
-    @media (max-width: $breakpoint-desktop) {
+    @media (max-width: $bp-desktop-max) {
         left: 50%;
         transform: translateX(-50%);
         top: 180px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 120px;
+        width: calc(100vw - 32px);
+        max-width: 320px;
     }
 }
 
@@ -465,20 +506,22 @@ $breakpoint-large: 1280px;
     .filterInput,
     .filterSelect {
         width: 100%;
-        height: 36px;
+        height: 40px; // taller for easier touch
         padding: 0 12px;
         border: 1px solid $border-color;
         border-radius: 4px;
         font-family: 'Work Sans', sans-serif;
-        font-size: 12px;
+        font-size: 16px; // prevents iOS zoom on focus
         color: $text-primary;
         background: $white;
         outline: none;
         transition: all 0.2s ease;
+        -webkit-appearance: none;
+        appearance: none;
 
         &::placeholder {
             color: rgba($text-secondary, 0.4);
-            font-size: 11px;
+            font-size: 14px;
         }
 
         &:focus {
@@ -495,13 +538,15 @@ $breakpoint-large: 1280px;
 
     button {
         flex: 1;
-        height: 36px;
+        height: 40px;
         border-radius: 4px;
         font-family: 'Work Sans', sans-serif;
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .resetButton {
@@ -525,7 +570,7 @@ $breakpoint-large: 1280px;
     }
 }
 
-// Loading State
+// ── Loading State ──────────────────────────────────────────
 .loadingContainer {
     display: flex;
     flex-direction: column;
@@ -551,7 +596,7 @@ $breakpoint-large: 1280px;
     }
 }
 
-// Error State
+// ── Error State ────────────────────────────────────────────
 .errorContainer {
     display: flex;
     flex-direction: column;
@@ -578,6 +623,7 @@ $breakpoint-large: 1280px;
         font-weight: 600;
         cursor: pointer;
         transition: background 0.2s ease;
+        touch-action: manipulation;
 
         &:hover {
             background: color.adjust($secondary-color, $lightness: -5%);
@@ -585,7 +631,7 @@ $breakpoint-large: 1280px;
     }
 }
 
-// Animations
+// ── Animations ─────────────────────────────────────────────
 @keyframes spin {
     to {
         transform: rotate(360deg);

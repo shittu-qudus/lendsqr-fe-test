@@ -1,30 +1,29 @@
 @use 'sass:color';
 
-// Variables
+// ── Variables ──────────────────────────────────────────────
 $primary-color: #213f7d;
 $secondary-color: #39cdcc;
 $text-color: #545f7d;
-$text-light: #545f7d80;
-$border-color: #545f7d26;
-$input-border: rgba(84, 95, 125, 0.15);
+$text-light: rgba(84, 95, 125, 0.5);
+$border-color: rgba(84, 95, 125, 0.15);
 $white: #ffffff;
 
-// Breakpoints
-$breakpoint-tablet: 768px;
-$breakpoint-desktop: 1024px;
-$breakpoint-large: 1440px;
+// ── Breakpoints (max-width values) ─────────────────────────
+$bp-mobile-max: 479px;
+$bp-tablet-max: 767px;
+$bp-desktop-max: 1023px;
+$bp-large-max: 1439px;
 
-.loginContainer {
-    display: flex;
-    min-height: 100vh;
-    width: 100%;
-    background: $white;
-
-    @media (max-width: $breakpoint-tablet) {
-        flex-direction: column;
-    }
+// ── Reset / Base ───────────────────────────────────────────
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+// ── Accessibility ──────────────────────────────────────────
 .srOnly {
     position: absolute;
     width: 1px;
@@ -37,61 +36,123 @@ $breakpoint-large: 1440px;
     border: 0;
 }
 
-// Left Section - 50% width
-.leftSection {
-    flex: 0 0 50%;
-    background: $white;
-    padding: 2rem 2rem 2rem 4rem; // Increased left padding to move logo in
+// ── Layout ─────────────────────────────────────────────────
+.loginContainer {
     display: flex;
-    flex-direction: column;
-    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    background: $white;
 
-    @media (max-width: $breakpoint-tablet) {
-        flex: 0 0 auto;
-        padding: 2rem;
-    }
-
-    .logoWrapper {
-        margin: 2rem 0 6rem 0; // Adjusted margins
-
-        @media (max-width: $breakpoint-tablet) {
-            margin: 1rem 0 3rem 0;
-        }
-
-        .logo {
-            width: 173.76px;
-            height: 36px;
-            object-fit: contain;
-        }
-    }
-
-    .illustrationWrapper {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-
-        .illustration {
-            width: 100%;
-            height: auto;
-            max-height: 530px; // Increased height
-            object-fit: contain;
-            transform: scale(1.1); // Slightly increase size
-            margin-top: -2rem; // Adjust vertical alignment
-
-            @media (max-width: $breakpoint-tablet) {
-                max-height: 350px;
-                transform: scale(1);
-                margin-top: 0;
-            }
-        }
+    @media (max-width: $bp-tablet-max) {
+        flex-direction: column;
     }
 }
 
+// ── Left Section ───────────────────────────────────────────
+.leftSection {
+    flex: 0 0 50%;
+    background: $white;
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 2rem 2rem 5rem;
 
+    @media (max-width: $bp-large-max) {
+        padding: 2.5rem 2rem 2rem 4rem;
+    }
+
+    @media (max-width: $bp-desktop-max) {
+        padding: 2rem 1.5rem 2rem 2.5rem;
+    }
+
+    @media (max-width: $bp-tablet-max) {
+        flex: 0 0 auto;
+        padding: 1.5rem 1.25rem;
+        align-items: center;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 1.25rem 1rem;
+    }
+}
+
+.logoWrapper {
+    margin-bottom: 5rem;
+
+    @media (max-width: $bp-desktop-max) {
+        margin-bottom: 3rem;
+    }
+
+    @media (max-width: $bp-tablet-max) {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+}
+
+.logo {
+    width: 173.76px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+
+    @media (max-width: $bp-mobile-max) {
+        width: 140px;
+        height: auto;
+    }
+}
+
+.illustrationWrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    @media (max-width: $bp-tablet-max) {
+        flex: 0 0 auto;
+        max-height: 260px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        max-height: 200px;
+    }
+}
+
+.illustration {
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    max-height: 530px;
+    object-fit: contain;
+    display: block;
+
+    @media (max-width: $bp-desktop-max) {
+        max-height: 420px;
+    }
+
+    @media (max-width: $bp-tablet-max) {
+        max-height: 240px;
+        max-width: 360px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        max-height: 190px;
+        max-width: 280px;
+    }
+}
+
+.illustrationPlaceholder {
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    background: rgba($text-color, 0.04);
+    border-radius: 8px;
+
+    @media (max-width: $bp-tablet-max) {
+        height: 240px;
+    }
+}
+
+// ── Right Section ──────────────────────────────────────────
 .rightSection {
     flex: 0 0 50%;
     background: $white;
@@ -99,240 +160,276 @@ $breakpoint-large: 1440px;
     align-items: center;
     justify-content: flex-start;
     padding: 2rem 4rem 2rem 6rem;
-    box-shadow: -4px 0px 20px rgba(0, 0, 0, 0.03);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.04);
 
-    @media (max-width: $breakpoint-tablet) {
-        flex: 0 0 auto;
-        padding: 2rem;
-        justify-content: center;
-    }
-
-    .formWrapper {
-        max-width: 447px;
-        width: 100%;
-        margin-top: -2rem;
-
-        @media (max-width: $breakpoint-tablet) {
-            max-width: 100%;
-            margin-top: 0;
-        }
-
-        .welcomeTitle {
-            font-family: 'Avenir Next', sans-serif;
-            font-size: 40px;
-            font-weight: 700;
-            line-height: 54.64px;
-            letter-spacing: -0.04em;
-            color: $primary-color;
-            margin-bottom: 0.5rem;
-
-            @media (max-width: $breakpoint-tablet) {
-                font-size: 32px;
-                line-height: 44px;
-            }
-        }
-
-        .subtitle {
-            font-family: 'Avenir Next', sans-serif;
-            font-size: 20px;
-            font-weight: 400;
-            line-height: 27.32px;
-            color: $text-color;
-            margin-bottom: 3.75rem;
-
-            @media (max-width: $breakpoint-tablet) {
-                font-size: 18px;
-                margin-bottom: 2.5rem;
-            }
-        }
-    }
-
-    .form {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-
-        .inputGroup {
-            width: 100%;
-
-            .input {
-                width: 100%;
-                height: 50px;
-                padding: 0 1rem;
-                border: 2px solid $input-border;
-                border-radius: 5px;
-                font-family: 'Avenir Next', sans-serif;
-                font-size: 14px;
-                color: $text-color;
-                outline: none;
-                transition: all 0.3s ease;
-                background: $white;
-
-                &::placeholder {
-                    color: $text-light;
-                    opacity: 0.8;
-                    font-size: 14px;
-                    font-weight: 400;
-                }
-
-                &:focus {
-                    border-color: $secondary-color;
-                }
-
-                @media (max-width: $breakpoint-tablet) {
-                    height: 45px;
-                    font-size: 13px;
-                }
-            }
-
-            .passwordWrapper {
-                position: relative;
-                width: 100%;
-
-                .passwordInput {
-                    width: 100%;
-                    height: 50px;
-                    padding: 0 80px 0 1rem;
-                    border: 2px solid $input-border;
-                    border-radius: 5px;
-                    font-family: 'Avenir Next', sans-serif;
-                    font-size: 14px;
-                    color: $text-color;
-                    outline: none;
-                    transition: all 0.3s ease;
-                    background: $white;
-
-                    &::placeholder {
-                        color: $text-light;
-                        opacity: 0.8;
-                        font-size: 14px;
-                        font-weight: 400;
-                    }
-
-                    &:focus {
-                        border-color: $secondary-color;
-                    }
-
-                    @media (max-width: $breakpoint-tablet) {
-                        height: 45px;
-                        font-size: 13px;
-                    }
-                }
-
-                .showButton {
-                    position: absolute;
-                    right: 1rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    background: none;
-                    border: none;
-                    font-family: 'Avenir Next', sans-serif;
-                    font-size: 12px;
-                    font-weight: 600;
-                    color: $secondary-color;
-                    letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    padding: 0.5rem;
-                    transition: opacity 0.3s ease;
-
-                    &:hover {
-                        opacity: 0.8;
-                    }
-
-                    @media (max-width: $breakpoint-tablet) {
-                        font-size: 11px;
-                        right: 0.75rem;
-                    }
-                }
-            }
-        }
-
-        .forgotPassword {
-            margin: 0.5rem 0 2rem;
-
-            .forgotLink {
-                font-family: 'Avenir Next', sans-serif;
-                font-size: 12px;
-                font-weight: 600;
-                color: $secondary-color;
-                text-decoration: none;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                transition: opacity 0.3s ease;
-
-                &:hover {
-                    opacity: 0.8;
-                }
-            }
-        }
-
-        .loginButton {
-            width: 100%;
-            height: 50px;
-            background: $secondary-color;
-            border: none;
-            border-radius: 8px;
-            font-family: 'Avenir Next', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: $white;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-
-            &:hover {
-                background-color: color.adjust($secondary-color, $lightness: -5%);
-            }
-
-            &:active {
-                background-color: color.adjust($secondary-color, $lightness: -10%);
-                transform: translateY(1px);
-            }
-
-            @media (max-width: $breakpoint-tablet) {
-                height: 45px;
-                font-size: 13px;
-            }
-        }
-    }
-}
-
-// Responsive adjustments for desktop
-@media (min-width: $breakpoint-desktop) and (max-width: $breakpoint-large) {
-    .leftSection {
-        padding: 2rem 2rem 2rem 5rem;
-
-        .illustrationWrapper {
-            .illustration {
-                max-height: 500px;
-            }
-        }
-    }
-
-    .rightSection {
+    @media (max-width: $bp-large-max) {
         padding: 2rem 3rem 2rem 5rem;
     }
-}
 
-// Large desktop screens
-@media (min-width: $breakpoint-large) {
-    .leftSection {
-        padding: 2rem 2rem 2rem 8rem;
-
-        .illustrationWrapper {
-            .illustration {
-                max-height: 580px;
-            }
-        }
+    @media (max-width: $bp-desktop-max) {
+        padding: 2rem 2rem 2rem 3rem;
     }
 
-    .rightSection {
-        padding: 2rem 4rem 2rem 8rem;
+    @media (max-width: $bp-tablet-max) {
+        flex: 0 0 auto;
+        padding: 2rem 1.25rem 3rem;
+        justify-content: center;
+        box-shadow: none;
+        border-top: 1px solid rgba($text-color, 0.08);
+    }
 
-        .formWrapper {
-            max-width: 500px;
+    @media (max-width: $bp-mobile-max) {
+        padding: 1.5rem 1rem 2.5rem;
+    }
+}
+
+// ── Form Wrapper ───────────────────────────────────────────
+.formWrapper {
+    width: 100%;
+    max-width: 447px;
+
+    @media (max-width: $bp-tablet-max) {
+        max-width: 100%;
+    }
+}
+
+.welcomeTitle {
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+    color: $primary-color;
+    margin-bottom: 0.5rem;
+
+    @media (max-width: $bp-desktop-max) {
+        font-size: 36px;
+    }
+
+    @media (max-width: $bp-tablet-max) {
+        font-size: 32px;
+        text-align: center;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 28px;
+    }
+}
+
+.subtitle {
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: $text-color;
+    margin-bottom: 3.75rem;
+
+    @media (max-width: $bp-desktop-max) {
+        font-size: 18px;
+        margin-bottom: 3rem;
+    }
+
+    @media (max-width: $bp-tablet-max) {
+        font-size: 16px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 15px;
+        margin-bottom: 1.75rem;
+    }
+}
+
+// ── Error Message ──────────────────────────────────────────
+.errorMessage {
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 13px;
+    color: #e4033b;
+    background: rgba(228, 3, 59, 0.06);
+    border: 1px solid rgba(228, 3, 59, 0.2);
+    border-radius: 4px;
+    padding: 0.6rem 0.875rem;
+    margin-bottom: 1rem;
+}
+
+// ── Form ───────────────────────────────────────────────────
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    @media (max-width: $bp-mobile-max) {
+        gap: 1.25rem;
+    }
+}
+
+// ── Input Group ────────────────────────────────────────────
+.inputGroup {
+    width: 100%;
+}
+
+%inputBase {
+    width: 100%;
+    height: 50px;
+    padding: 0 1rem;
+    border: 1.5px solid $border-color;
+    border-radius: 5px;
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 14px;
+    color: $text-color;
+    background: $white;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &::placeholder {
+        color: $text-light;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    &:focus {
+        border-color: $secondary-color;
+        box-shadow: 0 0 0 3px rgba($secondary-color, 0.1);
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        height: 48px;
+        font-size: 16px;
+
+        &::placeholder {
+            font-size: 16px;
         }
+    }
+}
+
+.input {
+    @extend %inputBase;
+}
+
+// ── Password Wrapper ───────────────────────────────────────
+.passwordWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.passwordInput {
+    @extend %inputBase;
+    padding-right: 5rem;
+}
+
+.showButton {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: $secondary-color;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    line-height: 1;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+        opacity: 0.75;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $secondary-color;
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 11px;
+        right: 0.75rem;
+    }
+}
+
+// ── Forgot Password ────────────────────────────────────────
+.forgotPassword {
+    margin: 1.25rem 0 2rem;
+
+    @media (max-width: $bp-mobile-max) {
+        margin: 1rem 0 1.75rem;
+    }
+}
+
+.forgotLink {
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: $secondary-color;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: opacity 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+        opacity: 0.75;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $secondary-color;
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+}
+
+// ── Login Button ───────────────────────────────────────────
+.loginButton {
+    width: 100%;
+    height: 50px;
+    background: $secondary-color;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Avenir Next', 'Avenir', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: $white;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:hover {
+        background-color: color.adjust($secondary-color, $lightness: -5%);
+    }
+
+    &:active {
+        background-color: color.adjust($secondary-color, $lightness: -10%);
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid $primary-color;
+        outline-offset: 3px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        height: 50px;
+        font-size: 14px;
+        border-radius: 6px;
     }
 }

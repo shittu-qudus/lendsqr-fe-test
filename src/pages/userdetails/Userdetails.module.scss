@@ -10,16 +10,35 @@ $border: #e5e5e5;
 $star-fill: #e9b200;
 $star-empty: #c8cacd;
 
+// ── Breakpoints ────────────────────────────────────────────
+$bp-mobile-max: 479px;
+$bp-tablet-max: 767px;
+$bp-desktop-max: 1023px;
+
+// ── Reset ──────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+// ── Page Container ─────────────────────────────────────────
 .container {
     padding: 32px 40px;
     background: $bg-page;
     font-family: 'Work Sans', sans-serif;
+    min-height: 100vh;
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         padding: 20px 16px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 16px 12px;
     }
 }
 
+// ── Back Button ────────────────────────────────────────────
 .backButton {
     display: inline-flex;
     align-items: center;
@@ -32,6 +51,8 @@ $star-empty: #c8cacd;
     font-family: inherit;
     padding: 0;
     margin-bottom: 24px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 
     &:hover {
         opacity: 0.7;
@@ -40,41 +61,68 @@ $star-empty: #c8cacd;
     svg {
         font-size: 16px;
     }
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
 }
 
+// ── Page Header ────────────────────────────────────────────
 .pageHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 28px;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
 
     h1 {
         font-size: 24px;
         font-weight: 600;
         color: $text-main;
         margin: 0;
+
+        @media (max-width: $bp-mobile-max) {
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        margin-bottom: 16px;
     }
 }
 
 .headerActions {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
-.btnBlacklist {
+%actionBtn {
     padding: 10px 20px;
-    border: 1px solid $danger;
-    background: transparent;
-    color: $danger;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
     font-family: inherit;
     letter-spacing: 0.5px;
     cursor: pointer;
+    background: transparent;
+    transition: background 0.2s ease, color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+}
+
+.btnBlacklist {
+    @extend %actionBtn;
+    border: 1px solid $danger;
+    color: $danger;
 
     &:hover {
         background: $danger;
@@ -83,16 +131,9 @@ $star-empty: #c8cacd;
 }
 
 .btnActivate {
-    padding: 10px 20px;
+    @extend %actionBtn;
     border: 1px solid $primary;
-    background: transparent;
     color: $primary;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: inherit;
-    letter-spacing: 0.5px;
-    cursor: pointer;
 
     &:hover {
         background: $primary;
@@ -100,6 +141,7 @@ $star-empty: #c8cacd;
     }
 }
 
+// ── Profile Card ───────────────────────────────────────────
 .profileCard {
     background: $bg-card;
     border-radius: 4px;
@@ -112,12 +154,17 @@ $star-empty: #c8cacd;
     display: flex;
     align-items: center;
     padding: 32px 40px 0;
-    flex-wrap: wrap;
     gap: 24px;
+    flex-wrap: wrap;
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         padding: 20px 16px 0;
         gap: 16px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 16px 12px 0;
+        gap: 12px;
     }
 }
 
@@ -136,6 +183,11 @@ $star-empty: #c8cacd;
         width: 100%;
         height: 100%;
     }
+
+    @media (max-width: $bp-mobile-max) {
+        width: 64px;
+        height: 64px;
+    }
 }
 
 .profileInfo {
@@ -149,20 +201,29 @@ $star-empty: #c8cacd;
     font-weight: 600;
     color: $text-main;
     margin: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 18px;
+    }
 }
 
 .profileId {
     font-size: 14px;
     color: $text-body;
     margin: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 12px;
+    }
 }
 
 .divider {
     width: 1px;
     height: 72px;
     background: $border;
+    flex-shrink: 0;
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         display: none;
     }
 }
@@ -206,27 +267,44 @@ $star-empty: #c8cacd;
     font-weight: 700;
     color: $text-main;
     margin: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 18px;
+    }
 }
 
 .bankInfo {
     font-size: 13px;
     color: $text-body;
     margin: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 11px;
+    }
 }
 
+// ── Tabs ───────────────────────────────────────────────────
 .tabs {
     display: flex;
     margin-top: 28px;
     padding: 0 40px;
     border-bottom: 1px solid $border;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
 
     &::-webkit-scrollbar {
         display: none;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         padding: 0 16px;
+        margin-top: 20px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 0 12px;
+        margin-top: 16px;
     }
 }
 
@@ -241,9 +319,17 @@ $star-empty: #c8cacd;
     color: $text-label;
     white-space: nowrap;
     margin-bottom: -1px;
+    transition: color 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 
     &:hover {
         color: $primary;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 12px;
+        padding: 12px 12px;
     }
 }
 
@@ -253,17 +339,23 @@ $star-empty: #c8cacd;
     font-weight: 500;
 }
 
+// ── Details Card ───────────────────────────────────────────
 .detailsCard {
     background: $bg-card;
     border-radius: 4px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     padding: 32px 40px;
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         padding: 20px 16px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        padding: 16px 12px;
     }
 }
 
+// ── Section ────────────────────────────────────────────────
 .section {
     margin-bottom: 0;
 }
@@ -273,90 +365,161 @@ $star-empty: #c8cacd;
     font-weight: 500;
     color: $text-main;
     margin: 0 0 24px;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
 }
 
 .sectionContent {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 32px; // matches row-gap between grid rows inside a section
+
+    @media (max-width: $bp-tablet-max) {
+        gap: 24px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        gap: 20px;
+    }
 }
 
 .sectionDivider {
     border: none;
     border-top: 1px solid $border;
     margin: 32px 0;
+
+    @media (max-width: $bp-mobile-max) {
+        margin: 20px 0;
+    }
 }
 
+// ── Info Grids ─────────────────────────────────────────────
+// Shared row gap for all grids
+%gridBase {
+    display: grid;
+    row-gap: 32px;
+    column-gap: 0; // columns handle their own spacing via width
+
+    @media (max-width: $bp-tablet-max) {
+        row-gap: 24px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        row-gap: 20px;
+    }
+}
+
+// Personal Info row 1:
+// FULL NAME | PHONE NUMBER | EMAIL ADDRESS | BVN | GENDER
+// Wider first cols, narrow Gender pushed to edge
 .grid5 {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    @extend %gridBase;
+    grid-template-columns: 2fr 2fr 2.5fr 2fr 1fr;
     column-gap: 16px;
-    row-gap: 28px;
 
-    @media (max-width: 1024px) {
+    @media (max-width: $bp-desktop-max) {
         grid-template-columns: repeat(3, 1fr);
+        column-gap: 16px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: $bp-tablet-max) {
         grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
     }
 }
 
+// Education row 1:
+// LEVEL OF EDUCATION | EMPLOYMENT STATUS | SECTOR OF EMPLOYMENT | DURATION OF EMPLOYMENT
+// All roughly equal but duration pushed to far right edge
 .grid4 {
-    display: grid;
+    @extend %gridBase;
     grid-template-columns: repeat(4, 1fr);
     column-gap: 16px;
-    row-gap: 28px;
 
-    @media (max-width: 1024px) {
+    @media (max-width: $bp-desktop-max) {
         grid-template-columns: repeat(3, 1fr);
+        column-gap: 16px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: $bp-tablet-max) {
         grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 12px;
     }
 }
 
+// Personal Info row 2: MARITAL STATUS | CHILDREN | TYPE OF RESIDENCE
+// Education row 2:    OFFICE EMAIL   | MONTHLY INCOME | LOAN REPAYMENT
+// Only 3 cols, left-aligned — NOT stretching full width
 .gridRow {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    @extend %gridBase;
+    grid-template-columns: 2fr 2fr 2.5fr;
     column-gap: 16px;
-    row-gap: 28px;
+    max-width: 75%; // keeps row from stretching across all 5 col-widths
 
-    @media (max-width: 1024px) {
+    @media (max-width: $bp-desktop-max) {
         grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: $bp-tablet-max) {
         grid-template-columns: repeat(2, 1fr);
+        max-width: 100%;
+        column-gap: 12px;
     }
 
-    @media (max-width: 480px) {
-        grid-template-columns: 1fr;
+    @media (max-width: $bp-mobile-max) {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 100%;
+        column-gap: 12px;
     }
 }
 
+// Socials: TWITTER | FACEBOOK | INSTAGRAM
+// Guarantor: FULL NAME | PHONE NUMBER | EMAIL ADDRESS | RELATIONSHIP
 .grid3 {
-    display: grid;
+    @extend %gridBase;
     grid-template-columns: repeat(3, 1fr);
     column-gap: 16px;
-    row-gap: 28px;
+    max-width: 75%;
 
-    @media (max-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
+    @media (max-width: $bp-desktop-max) {
+        max-width: 100%;
     }
 
-    @media (max-width: 480px) {
-        grid-template-columns: 1fr;
+    @media (max-width: $bp-tablet-max) {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 100%;
+        column-gap: 12px;
+    }
+
+    @media (max-width: $bp-mobile-max) {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 100%;
+        column-gap: 12px;
     }
 }
 
+// ── Info Field ─────────────────────────────────────────────
 .infoField {
     display: flex;
     flex-direction: column;
     gap: 8px;
     margin: 0;
     padding: 0;
+    min-width: 0; // prevents grid blowout
 }
 
 .infoLabel {
@@ -367,6 +530,10 @@ $star-empty: #c8cacd;
     text-transform: uppercase;
     margin: 0;
     padding: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 10px;
+    }
 }
 
 .infoValue {
@@ -374,10 +541,16 @@ $star-empty: #c8cacd;
     font-weight: 500;
     color: $text-main;
     word-break: break-word;
+    overflow-wrap: anywhere;
     margin: 0;
     padding: 0;
+
+    @media (max-width: $bp-mobile-max) {
+        font-size: 13px;
+    }
 }
 
+// ── Empty Tab ──────────────────────────────────────────────
 .emptyTab {
     display: flex;
     justify-content: center;
@@ -387,9 +560,14 @@ $star-empty: #c8cacd;
     p {
         color: $text-label;
         font-size: 15px;
+
+        @media (max-width: $bp-mobile-max) {
+            font-size: 13px;
+        }
     }
 }
 
+// ── Loading State ──────────────────────────────────────────
 .loadingContainer {
     display: flex;
     flex-direction: column;
@@ -399,6 +577,7 @@ $star-empty: #c8cacd;
     gap: 16px;
     color: $text-label;
     font-size: 15px;
+    font-family: 'Work Sans', sans-serif;
 }
 
 .loader {
@@ -410,12 +589,7 @@ $star-empty: #c8cacd;
     animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
+// ── Error State ────────────────────────────────────────────
 .errorContainer {
     display: flex;
     flex-direction: column;
@@ -425,6 +599,7 @@ $star-empty: #c8cacd;
     gap: 16px;
     color: $danger;
     font-size: 15px;
+    font-family: 'Work Sans', sans-serif;
 
     button {
         padding: 10px 24px;
@@ -435,9 +610,17 @@ $star-empty: #c8cacd;
         cursor: pointer;
         font-size: 14px;
         font-family: inherit;
+        touch-action: manipulation;
 
         &:hover {
             opacity: 0.85;
         }
+    }
+}
+
+// ── Animations ─────────────────────────────────────────────
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
