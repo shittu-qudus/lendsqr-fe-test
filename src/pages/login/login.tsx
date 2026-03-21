@@ -1,4 +1,4 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, Suspense } from 'react';
 import styles from './Login.module.scss';
 import { useNavigate } from 'react-router-dom';
 
