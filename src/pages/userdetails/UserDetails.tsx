@@ -149,7 +149,7 @@ const UserDetails: React.FC = () => {
         async (userId: string): Promise<UserDetail | null> => {
             try {
                 const response = await axios.get<Record<string, unknown>>(
-                    `http://localhost:3001/users/${userId}`,
+                    `/api/users/${userId}`,
                 );
                 const normalised = normaliseUser(response.data);
                 await setCachedUser<UserDetail>(userId, normalised);

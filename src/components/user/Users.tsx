@@ -284,7 +284,7 @@ const Users: React.FC = () => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:3001/users');
+            const response = await axios.get('/api/users');
 
             const userData: User[] = response.data.map((user: Record<string, unknown>) => ({
                 id: String(user.id),
