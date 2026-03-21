@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './Sidebar.module.scss';
+import { FiX, FiMenu } from 'react-icons/fi';
 
 // ============ TYPES ============
 interface MenuItem {
@@ -106,13 +107,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
             <button
                 className={styles.hamburger}
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileOpen}
+                aria-controls="main-sidebar"
                 onClick={() => setMobileOpen(prev => !prev)}
             >
-                <img
-                    src={mobileOpen ? '/icons/close.svg' : '/icons/menu.svg'}
-                    alt=""
-                    className={styles.icon}
-                />
+                {mobileOpen
+                    ? <FiX className={styles.icon} aria-hidden="true" />
+                    : <FiMenu className={styles.icon} aria-hidden="true" />
+                }
             </button>
 
             {/* ── Backdrop overlay (mobile) ── */}
@@ -126,13 +128,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
             {/* ── Sidebar ── */}
             <nav
+                id="main-sidebar"
                 className={`${styles.sidebar} ${mobileOpen ? styles.open : ''}`}
                 aria-label="Main navigation"
             >
                 <div className={styles.sidebarContent}>
 
                     {/* Switch Organization */}
-                    <button className={styles.organizationSwitch}>
+                    <button className={styles.organizationSwitch} aria-label="Switch organization">
                         <img src="/icons/organization.svg" alt="" className={styles.orgIcon} />
                         <span className={styles.orgText}>Switch Organization</span>
                         <img src="/icons/dropdown.svg" alt="" className={styles.dropdownIcon} />
@@ -142,6 +145,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                     <button
                         className={`${styles.dashboardLink} ${isActive('/dashboard') ? styles.active : ''}`}
                         onClick={() => handleNavigate('/dashboard')}
+                        aria-current={isActive('/dashboard') ? 'page' : undefined}
                     >
                         <img src="/icons/home.svg" alt="" className={styles.dashboardIcon} />
                         <span className={styles.dashboardText}>Dashboard</span>
@@ -150,43 +154,39 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                     {/* Menu Sections */}
                     <div className={styles.menuSections}>
                         {menuSections.map(section => (
-                            <div key={section.title} className={styles.menuSection}>
+                            <section key={section.title} aria-label={section.title}>
                                 <p className={styles.sectionTitle}>{section.title}</p>
-
-                                {section.items.map(item => (
-                                    <button
-                                        key={item.path}
-                                        className={`${styles.menuItem} ${isActive(item.path) ? styles.active : ''}`}
-                                        onClick={() => handleNavigate(item.path)}
-                                    >
-                                        {/*
-                                            SVGs are loaded as <img> with no CSS filter —
-                                            they display their own natural embedded colors,
-                                            exactly as seen in the design reference.
-                                        */}
-                                        <img
-                                            src={item.icon}
-                                            alt=""
-                                            className={styles.menuIconImg}
-                                        />
-                                        <span className={styles.menuLabel}>{item.label}</span>
-                                        {item.badge !== undefined && (
-                                            <span className={styles.menuBadge}>{item.badge}</span>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
+                                <ul className={styles.menuList} role="list">
+                                    {section.items.map(item => (
+                                        <li key={item.path}>
+                                            <button
+                                                className={`${styles.menuItem} ${isActive(item.path) ? styles.active : ''}`}
+                                                onClick={() => handleNavigate(item.path)}
+                                                aria-current={isActive(item.path) ? 'page' : undefined}
+                                            >
+                                                <img src={item.icon} alt="" className={styles.menuIconImg} />
+                                                <span className={styles.menuLabel}>{item.label}</span>
+                                                {item.badge !== undefined && (
+                                                    <span className={styles.menuBadge} aria-label={`${item.badge} notifications`}>
+                                                        {item.badge}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </section>
                         ))}
                     </div>
 
                     {/* Logout */}
-                    <div className={styles.logoutSection}>
-                        <button className={styles.logoutButton} onClick={handleLogout}>
+                    <footer className={styles.logoutSection}>
+                        <button className={styles.logoutButton} onClick={handleLogout} aria-label="Logout">
                             <img src="/icons/logout.svg" alt="" className={styles.logoutIcon} />
                             <span className={styles.logoutText}>Logout</span>
                         </button>
                         <p className={styles.versionText}>v1.2.0</p>
-                    </div>
+                    </footer>
 
                 </div>
             </nav>

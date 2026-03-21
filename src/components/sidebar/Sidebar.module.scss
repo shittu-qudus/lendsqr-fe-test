@@ -1,6 +1,6 @@
 @use 'sass:color';
 
-// ── Variables ────────────────────────────────────────────────────────────────
+// ── Variables
 $primary-color: #213f7d;
 $secondary-color: #39cdcc;
 $text-primary: #213f7d;
@@ -16,7 +16,7 @@ $header-height-mobile: 70px;
 $breakpoint-tablet: 768px;
 $breakpoint-large: 1280px;
 
-// ── Hamburger (mobile only) ───────────────────────────────────────────────────
+// ── Hamburger (mobile only) 
 .hamburger {
     display: none;
 
@@ -121,7 +121,7 @@ $breakpoint-large: 1280px;
     }
 }
 
-// ── Inner content wrapper ────────────────────────────────────────────────────
+// ── Inner content wrapper 
 .sidebarContent {
     display: flex;
     flex-direction: column;
@@ -129,7 +129,7 @@ $breakpoint-large: 1280px;
     min-height: 100%;
 }
 
-// ── Switch Organization ───────────────────────────────────────────────────────
+// ── Switch Organization 
 .organizationSwitch {
     display: flex;
     align-items: center;

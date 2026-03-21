@@ -25,6 +25,18 @@ $breakpoint-large: 1440px;
     }
 }
 
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 // Left Section - 50% width
 .leftSection {
     flex: 0 0 50%;
@@ -79,14 +91,14 @@ $breakpoint-large: 1440px;
     }
 }
 
-// Right Section - 50% width
+
 .rightSection {
     flex: 0 0 50%;
     background: $white;
     display: flex;
     align-items: center;
-    justify-content: flex-start; // Align to left
-    padding: 2rem 4rem 2rem 6rem; // Adjusted padding
+    justify-content: flex-start;
+    padding: 2rem 4rem 2rem 6rem;
     box-shadow: -4px 0px 20px rgba(0, 0, 0, 0.03);
 
     @media (max-width: $breakpoint-tablet) {
@@ -98,7 +110,7 @@ $breakpoint-large: 1440px;
     .formWrapper {
         max-width: 447px;
         width: 100%;
-        margin-top: -2rem; // Align with illustration height
+        margin-top: -2rem;
 
         @media (max-width: $breakpoint-tablet) {
             max-width: 100%;

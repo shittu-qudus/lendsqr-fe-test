@@ -28,9 +28,9 @@ $breakpoint-large: 1280px;
 }
 
 .statIcon {
-    width: 24px;
-    height: 24px;
-    color: #545f7d; // only works if SVG uses fill="currentColor"
+    width: 10px;
+    height: 10px;
+    color: #545f7d;
 }
 
 // Page Header
@@ -62,6 +62,24 @@ $breakpoint-large: 1280px;
     }
 }
 
+.iconWrap {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+
+    img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        display: block;
+    }
+}
+
 .statCard {
     background: $white;
     padding: 18px 20px;
@@ -70,14 +88,15 @@ $breakpoint-large: 1280px;
     border: 1px solid $border-color;
     transition: all 0.2s ease;
 
+
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
         transform: translateY(-2px);
     }
 
     .statIcon {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -85,7 +104,7 @@ $breakpoint-large: 1280px;
         margin-bottom: 12px;
 
         svg {
-            font-size: 18px;
+            font-size: 10px;
             color: $primary-color;
         }
     }

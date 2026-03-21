@@ -6,79 +6,93 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Simple validation (you can improve this later)
     if (!email || !password) {
-      alert('Please enter email and password');
+      setError('Please enter email and password');
       return;
     }
 
-    // Fake login logic (replace with API later)
+    setError('');
     console.log('Logging in with:', { email, password });
-
-    // Navigate to dashboard
     navigate('/dashboard');
   };
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.leftSection}>
-        <div className={styles.logoWrapper} style={{ paddingLeft: '30px' }}>
-          <img src="/logo.png" alt="Lendsqr" className={styles.logo} />
-        </div>
-        <div className={styles.illustrationWrapper}>
-          <img
-            src="/image.png"
-            alt="Login illustration"
-            className={styles.illustration}
-          />
-        </div>
-      </div>
+    <main className={styles.loginContainer}>
 
-      <div className={styles.rightSection}>
+      <section className={styles.leftSection} aria-label="Branding">
+        <header className={styles.logoWrapper} style={{ paddingLeft: '30px' }}>
+          <img src="/logo.png" alt="Lendsqr" className={styles.logo} />
+        </header>
+        <figure className={styles.illustrationWrapper}>
+          <img src="/image.png" alt="Person managing finances online" className={styles.illustration} />
+        </figure>
+      </section>
+
+      <section className={styles.rightSection} aria-label="Login">
         <div className={styles.formWrapper}>
           <h1 className={styles.welcomeTitle}>Welcome!</h1>
-          <p className={styles.subtitle}>Enter details to login.</p>
+          <p className={styles.subtitle} id="login-subtitle">Enter details to login.</p>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.inputGroup}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={styles.input}
-                required
-              />
-            </div>
+          {error && (
+            <p role="alert" aria-live="assertive" className={styles.errorMessage}>
+              {error}
+            </p>
+          )}
 
-            <div className={styles.inputGroup}>
-              <div className={styles.passwordWrapper}>
+          <form onSubmit={handleSubmit} className={styles.form} noValidate>
+            <fieldset className={styles.fieldset}>
+              <legend className={styles.srOnly}>Account credentials</legend>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="email" className={styles.srOnly}>Email address</label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={styles.passwordInput}
-                  required
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={styles.input}
+                  autoComplete="email"
+                  aria-required="true"
                 />
-                <button
-                  type="button"
-                  className={styles.showButton}
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? 'HIDE' : 'SHOW'}
-                </button>
               </div>
-            </div>
+
+              <div className={styles.inputGroup}>
+                <div className={styles.passwordWrapper}>
+                  <label htmlFor="password" className={styles.srOnly}>Password</label>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={styles.passwordInput}
+                    autoComplete="current-password"
+                    aria-required="true"
+                  />
+                  <button
+                    type="button"
+                    className={styles.showButton}
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-controls="password"
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? 'HIDE' : 'SHOW'}
+                  </button>
+                </div>
+              </div>
+            </fieldset>
 
             <div className={styles.forgotPassword}>
-              <a href="#" className={styles.forgotLink}>
+              <a href="/forgot-password" className={styles.forgotLink}>
                 FORGOT PASSWORD?
               </a>
             </div>
@@ -88,8 +102,9 @@ const Login: React.FC = () => {
             </button>
           </form>
         </div>
-      </div>
-    </div>
+      </section>
+
+    </main>
   );
 };
 

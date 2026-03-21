@@ -55,7 +55,7 @@ $breakpoint-large: 1280px;
 
     @media (max-width: $breakpoint-tablet) {
         flex: 1;
-        justify-content: center; // center logo on mobile
+        justify-content: center;
     }
 
     .logo {
@@ -82,7 +82,7 @@ $breakpoint-large: 1280px;
     }
 
     @media (max-width: $breakpoint-tablet) {
-        display: none; // hidden on mobile
+        display: none;
     }
 
     .searchForm {

@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from './Users.module.scss';
 import {
-    FiUsers,
-    FiUserCheck,
     FiEye,
     FiUserX,
     FiUserCheck as FiUserCheckIcon,
 } from 'react-icons/fi';
-
 import { HiOutlineDotsVertical } from 'react-icons/hi';
+import { useSearch } from '../../context/SearchContext';
 
 // ============ TYPES ============
 interface User {
@@ -207,10 +205,11 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, color }) => (
 // ============ MAIN USERS COMPONENT ============
 const Users: React.FC = () => {
     const navigate = useNavigate();
+    const { searchQuery } = useSearch();
 
     // State
     const [users, setUsers] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [columnFilteredUsers, setColumnFilteredUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showFilter, setShowFilter] = useState<boolean>(false);
@@ -253,8 +252,34 @@ const Users: React.FC = () => {
 
             const orgs = [...new Set(users.map(user => user.organization))];
             setOrganizations(orgs);
+
+            setColumnFilteredUsers(users);
         }
     }, [users]);
+
+    // Live search filtering derived from columnFilteredUsers + searchQuery
+    const filteredUsers = useMemo(() => {
+        if (!searchQuery.trim()) return columnFilteredUsers;
+
+        const q = searchQuery.toLowerCase();
+        return columnFilteredUsers.filter(user =>
+            user.name.toLowerCase().includes(q) ||
+            user.email.toLowerCase().includes(q) ||
+            user.phone.includes(q) ||
+            user.organization.toLowerCase().includes(q) ||
+            user.status.toLowerCase().includes(q)
+        );
+    }, [searchQuery, columnFilteredUsers]);
+
+    // Keep pagination in sync with filteredUsers
+    useEffect(() => {
+        setPagination(prev => ({
+            ...prev,
+            currentPage: 1,
+            totalItems: filteredUsers.length,
+            totalPages: Math.ceil(filteredUsers.length / prev.itemsPerPage)
+        }));
+    }, [filteredUsers]);
 
     const fetchUsers = async () => {
         try {
@@ -275,12 +300,7 @@ const Users: React.FC = () => {
             }));
 
             setUsers(userData);
-            setFilteredUsers(userData);
-            setPagination(prev => ({
-                ...prev,
-                totalItems: userData.length,
-                totalPages: Math.ceil(userData.length / prev.itemsPerPage)
-            }));
+            setColumnFilteredUsers(userData);
             setError(null);
         } catch {
             setError('Failed to fetch users');
@@ -289,7 +309,7 @@ const Users: React.FC = () => {
         }
     };
 
-    // Filter Handler
+    // Column Filter Handler
     const handleFilter = (filters: FilterOptions) => {
         const filtered = users.filter(user => {
             let matches = true;
@@ -308,13 +328,7 @@ const Users: React.FC = () => {
             return matches;
         });
 
-        setFilteredUsers(filtered);
-        setPagination(prev => ({
-            ...prev,
-            currentPage: 1,
-            totalItems: filtered.length,
-            totalPages: Math.ceil(filtered.length / prev.itemsPerPage)
-        }));
+        setColumnFilteredUsers(filtered);
         setShowFilter(false);
     };
 
@@ -365,7 +379,6 @@ const Users: React.FC = () => {
         }
     };
 
-    // Navigate to user details
     const handleViewDetails = (userId: string) => {
         navigate(`/users/${userId}`);
     };
@@ -395,28 +408,43 @@ const Users: React.FC = () => {
                 <h1>Users</h1>
             </div>
 
-            {/* Stats Grid */}
-            <div className={styles.statsGrid}>
+            {/* Stats Grid */}<div className={styles.statsGrid}>
                 <StatCard
-                    icon={<img src="/icons/users.svg" alt="Users" className={styles.statIcon} />}
+                    icon={
+                        <div className={styles.iconWrap} style={{ backgroundColor: "#fce8ff" }}>
+                            <img src="/icons/users.svg" alt="Users" width={28} height={28} />
+                        </div>
+                    }
                     label="USERS"
                     value={stats.totalUsers}
                     color="#fce8ff"
                 />
                 <StatCard
-                    icon={<img src="/icons/active-users.svg" alt="Active Users" className={styles.statIcon} />}
+                    icon={
+                        <div className={styles.iconWrap} style={{ backgroundColor: "#eee8ff" }}>
+                            <img src="/icons/active-users.svg" alt="Active Users" width={28} height={28} />
+                        </div>
+                    }
                     label="ACTIVE USERS"
                     value={stats.activeUsers}
                     color="#eee8ff"
                 />
                 <StatCard
-                    icon={<img src="/icons/loans.svg" alt="Users with Loans" className={styles.statIcon} />}
+                    icon={
+                        <div className={styles.iconWrap} style={{ backgroundColor: "#feefec" }}>
+                            <img src="/icons/loans.svg" alt="Users with Loans" width={28} height={28} />
+                        </div>
+                    }
                     label="USERS WITH LOANS"
                     value={stats.usersWithLoans}
                     color="#feefec"
                 />
                 <StatCard
-                    icon={<img src="/icons/savings.svg" alt="Users with Savings" className={styles.statIcon} />}
+                    icon={
+                        <div className={styles.iconWrap} style={{ backgroundColor: "#ffebf0" }}>
+                            <img src="/icons/savings.svg" alt="Users with Savings" width={28} height={28} />
+                        </div>
+                    }
                     label="USERS WITH SAVINGS"
                     value={stats.usersWithSavings}
                     color="#ffebf0"
@@ -430,116 +458,100 @@ const Users: React.FC = () => {
                         <tr>
                             <th>
                                 ORGANIZATION
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th>
                                 USERNAME
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th>
                                 EMAIL
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th>
                                 PHONE NUMBER
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th>
                                 DATE JOINED
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th>
                                 STATUS
-                                <img
-                                    src="/filter-icon.svg"
-                                    alt="Filter"
-                                    className={styles.filterIcon}
-                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }}
-                                />
+                                <img src="/filter-icon.svg" alt="Filter" className={styles.filterIcon}
+                                    onClick={(e) => { e.stopPropagation(); setShowFilter(true); }} />
                             </th>
                             <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {getCurrentPageData().map((user) => (
-                            <tr
-                                key={user.id}
-                                className={styles.tableRow}
-                                onClick={() => handleViewDetails(user.id)}
-                            >
-                                <td>{user.organization}</td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.phone}</td>
-                                <td>{formatDate(user.date)}</td>
-                                <td>
-                                    <span className={`${styles.status} ${getStatusClass(user.status)}`}>
-                                        {user.status}
-                                    </span>
-                                </td>
-                                <td className={styles.menuCell}>
-                                    <button
-                                        className={styles.menuButton}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setSelectedUser(selectedUser === user.id ? null : user.id);
-                                        }}
-                                    >
-                                        <HiOutlineDotsVertical />
-                                    </button>
-                                    {selectedUser === user.id && (
-                                        <div className={styles.userMenu}>
-                                            <button
-                                                className={styles.menuItem}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleViewDetails(user.id);
-                                                }}
-                                            >
-                                                <FiEye /> View Details
-                                            </button>
-                                            <button
-                                                className={styles.menuItem}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <FiUserX /> Blacklist User
-                                            </button>
-                                            <button
-                                                className={styles.menuItem}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                <FiUserCheckIcon /> Activate User
-                                            </button>
-                                        </div>
-                                    )}
+                        {getCurrentPageData().length === 0 ? (
+                            <tr>
+                                <td colSpan={7} style={{ textAlign: 'center', padding: '2rem' }}>
+                                    No users match your search.
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            getCurrentPageData().map((user) => (
+                                <tr
+                                    key={user.id}
+                                    className={styles.tableRow}
+                                    onClick={() => handleViewDetails(user.id)}
+                                >
+                                    <td>{user.organization}</td>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.phone}</td>
+                                    <td>{formatDate(user.date)}</td>
+                                    <td>
+                                        <span className={`${styles.status} ${getStatusClass(user.status)}`}>
+                                            {user.status}
+                                        </span>
+                                    </td>
+                                    <td className={styles.menuCell}>
+                                        <button
+                                            className={styles.menuButton}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedUser(selectedUser === user.id ? null : user.id);
+                                            }}
+                                        >
+                                            <HiOutlineDotsVertical />
+                                        </button>
+                                        {selectedUser === user.id && (
+                                            <div className={styles.userMenu}>
+                                                <button
+                                                    className={styles.menuItem}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleViewDetails(user.id);
+                                                    }}
+                                                >
+                                                    <FiEye /> View Details
+                                                </button>
+                                                <button
+                                                    className={styles.menuItem}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <FiUserX /> Blacklist User
+                                                </button>
+                                                <button
+                                                    className={styles.menuItem}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <FiUserCheckIcon /> Activate User
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
 
@@ -547,10 +559,7 @@ const Users: React.FC = () => {
                 <div className={styles.pagination}>
                     <div className={styles.paginationInfo}>
                         <span>Showing</span>
-                        <select
-                            value={pagination.itemsPerPage}
-                            onChange={handleItemsPerPageChange}
-                        >
+                        <select value={pagination.itemsPerPage} onChange={handleItemsPerPageChange}>
                             <option value={10}>10</option>
                             <option value={20}>20</option>
                             <option value={50}>50</option>

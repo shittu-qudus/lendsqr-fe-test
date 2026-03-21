@@ -6,6 +6,7 @@ import {
     FiChevronDown
 } from 'react-icons/fi';
 import { HiOutlineMenu } from 'react-icons/hi';
+import { useSearch } from '../../context/SearchContext';
 
 // Types defined directly in the component file
 interface User {
@@ -15,7 +16,6 @@ interface User {
 
 interface HeaderProps {
     user?: User;
-    onSearch?: (query: string) => void;
     onDocsClick?: () => void;
     onNotificationClick?: () => void;
     onProfileClick?: () => void;
@@ -24,26 +24,18 @@ interface HeaderProps {
 // Default user if none provided
 const defaultUser: User = {
     name: 'Adedeji',
-    avatar: ''
+    avatar: '/userImage.png'
 };
 
 const Header: React.FC<HeaderProps> = ({
     user = defaultUser,
-    onSearch,
     onDocsClick,
     onNotificationClick,
     onProfileClick
 }) => {
-    const [searchQuery, setSearchQuery] = useState<string>('');
+    const { searchQuery, setSearchQuery } = useSearch();
     const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-
-    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (onSearch && searchQuery.trim()) {
-            onSearch(searchQuery);
-        }
-    };
 
     const handleProfileClick = () => {
         setIsProfileOpen(!isProfileOpen);
@@ -69,7 +61,7 @@ const Header: React.FC<HeaderProps> = ({
 
                 {/* Search Section - Desktop */}
                 <div className={styles.searchSection}>
-                    <form onSubmit={handleSearch} className={styles.searchForm}>
+                    <div className={styles.searchForm}>
                         <input
                             type="text"
                             placeholder="Search for anything"
@@ -78,10 +70,10 @@ const Header: React.FC<HeaderProps> = ({
                             className={styles.searchInput}
                             aria-label="Search"
                         />
-                        <button type="submit" className={styles.searchButton}>
+                        <button type="button" className={styles.searchButton} aria-label="Search">
                             <FiSearch className={styles.searchIcon} />
                         </button>
-                    </form>
+                    </div>
                 </div>
 
                 {/* Actions Section */}
@@ -108,12 +100,6 @@ const Header: React.FC<HeaderProps> = ({
                             aria-expanded={isProfileOpen}
                             aria-haspopup="true"
                         >
-                            <div className={styles.profileInfo}>
-                                <span className={styles.userName}>{user.name}</span>
-                                <FiChevronDown
-                                    className={`${styles.dropdownIcon} ${isProfileOpen ? styles.rotated : ''}`}
-                                />
-                            </div>
                             <div className={styles.avatarWrapper}>
                                 {user.avatar ? (
                                     <img
@@ -127,6 +113,12 @@ const Header: React.FC<HeaderProps> = ({
                                     </div>
                                 )}
                             </div>
+                            <div className={styles.profileInfo}>
+                                <span className={styles.userName}>{user.name}</span>
+                                <FiChevronDown
+                                    className={`${styles.dropdownIcon} ${isProfileOpen ? styles.rotated : ''}`}
+                                />
+                            </div>
                         </button>
 
                         {/* Dropdown Menu */}
@@ -134,19 +126,13 @@ const Header: React.FC<HeaderProps> = ({
                             <div className={styles.dropdownMenu}>
                                 <ul className={styles.dropdownList}>
                                     <li>
-                                        <button className={styles.dropdownItem}>
-                                            Profile
-                                        </button>
+                                        <button className={styles.dropdownItem}>Profile</button>
                                     </li>
                                     <li>
-                                        <button className={styles.dropdownItem}>
-                                            Settings
-                                        </button>
+                                        <button className={styles.dropdownItem}>Settings</button>
                                     </li>
                                     <li>
-                                        <button className={styles.dropdownItem}>
-                                            Logout
-                                        </button>
+                                        <button className={styles.dropdownItem}>Logout</button>
                                     </li>
                                 </ul>
                             </div>
@@ -168,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({
             {isMobileMenuOpen && (
                 <div className={styles.mobileMenu}>
                     <div className={styles.mobileSearch}>
-                        <form onSubmit={handleSearch} className={styles.mobileSearchForm}>
+                        <div className={styles.mobileSearchForm}>
                             <input
                                 type="text"
                                 placeholder="Search for anything"
@@ -176,10 +162,10 @@ const Header: React.FC<HeaderProps> = ({
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className={styles.mobileSearchInput}
                             />
-                            <button type="submit" className={styles.mobileSearchButton}>
+                            <button type="button" className={styles.mobileSearchButton}>
                                 <FiSearch className={styles.mobileSearchIcon} />
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             )}
