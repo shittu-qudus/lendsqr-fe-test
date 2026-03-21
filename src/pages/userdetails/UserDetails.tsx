@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import styles from './UserDetails.module.scss';
+import styles from "./Userdetails.module.scss";
 import { FiArrowLeft, FiStar } from 'react-icons/fi';
 import {
     getCachedUser,
