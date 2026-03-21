@@ -1,9 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-module.exports = function handler(_req, res) {
-    const filePath = path.join(process.cwd(), 'db.json');
-    const raw = fs.readFileSync(filePath, 'utf-8');
+export default function handler(_req: VercelRequest, res: VercelResponse) {
+    const filePath = join(process.cwd(), 'db.json');
+    const raw = readFileSync(filePath, 'utf-8');
     const db = JSON.parse(raw);
     res.status(200).json(db.users);
-};
+}
