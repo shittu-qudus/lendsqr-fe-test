@@ -5,9 +5,9 @@ import Login from "./pages/login/login";
 import Dashboard from "./pages/dashboard/dashboard";
 import Users from "./components/user/Users";
 import UserDetails from "./pages/userdetails/UserDetails";
-import NotFound from "./components/NotFound";
-import ErrorBoundary from "./components/ErrorBoundary";
-import DashboardLayout from "./components/DashboardLayout";
+import NotFound from "./components/redirects/NotFound";
+import ErrorBoundary from "./components/redirects/ErrorBoundary";
+import DashboardLayout from "./components/redirects/DashboardLayout";
 import { SearchProvider } from "./context/SearchContext";
 
 import styles from "./App.module.scss";

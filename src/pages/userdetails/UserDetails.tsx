@@ -146,7 +146,7 @@ const UserDetails: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabKey>('general');
 
     const fetchFromAPI = useCallback(
-        async (userId: string, isBackground: boolean): Promise<UserDetail | null> => {
+        async (userId: string): Promise<UserDetail | null> => {
             try {
                 const response = await axios.get<Record<string, unknown>>(
                     `http://localhost:3001/users/${userId}`,
@@ -172,13 +172,13 @@ const UserDetails: React.FC = () => {
                 setUser(cached.data);
                 setLoading(false);
                 if (isCacheStale(cached.cachedAt)) {
-                    const fresh = await fetchFromAPI(userId, true);
+                    const fresh = await fetchFromAPI(userId);
                     if (fresh) setUser(fresh);
                 }
                 return;
             }
 
-            const fresh = await fetchFromAPI(userId, false);
+            const fresh = await fetchFromAPI(userId);
             if (fresh) {
                 setUser(fresh);
             } else {
