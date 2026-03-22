@@ -45,7 +45,7 @@ This project implements three core pages of the Lendsqr Admin Console:
 | React Router v6 | Declarative routing with nested layout support |
 | JSON Server | Local mock REST API serving 500 user records |
 | Axios | HTTP client for API requests |
-| LocalStorage / IndexedDB | Client-side caching of user detail records |
+| IndexedDB | Client-side caching of user detail records |
 | Vitest + React Testing Library | Unit and component testing |
 
 ---
